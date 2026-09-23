@@ -1,0 +1,104 @@
+{
+ "main_priced": {
+  "id": "evt01c0rn3rmainpriced",
+  "a": "Alexander Hernandez",
+  "b": "Arman Tsarukyan",
+  "when": "2026-09-26T22:00:00Z"
+ },
+ "thin_record": {
+  "id": "evt02c0rn3rthinrecord",
+  "a": "Aaron Pico",
+  "b": "Abus Magomedov",
+  "when": "2026-09-26T22:00:00Z"
+ },
+ "layoff": {
+  "id": "evt03c0rn3rlayoff",
+  "a": "Ange Loosa",
+  "b": "Alex Morono",
+  "when": "2026-09-26T22:00:00Z"
+ },
+ "weight_class_move": {
+  "id": "evt04c0rn3rweightclassmove",
+  "a": "Alexander Volkanovski",
+  "b": "Adrian Yanez",
+  "when": "2026-09-26T23:00:00Z"
+ },
+ "loose_name": {
+  "id": "evt05c0rn3rloosename",
+  "a": "Abd Al-Selwady",
+  "b": "Alessandro Costa",
+  "when": "2026-09-26T23:00:00Z"
+ },
+ "accent_name": {
+  "id": "evt06c0rn3raccentname",
+  "a": "José Daniel Medina",
+  "b": "Adam Fugitt",
+  "when": "2026-09-26T23:00:00Z"
+ },
+ "shared_name": {
+  "id": "evt07c0rn3rsharedname",
+  "a": "Mike Davis",
+  "b": "Axel Sola",
+  "when": "2026-09-27T00:00:00Z"
+ },
+ "other_books_only": {
+  "id": "evt08c0rn3rotherbooksonly",
+  "a": "Aleksandar Rakic",
+  "b": "Alexander Volkov",
+  "when": "2026-09-27T00:00:00Z"
+ },
+ "dk_one_side": {
+  "id": "evt09c0rn3rdkoneside",
+  "a": "Alonzo Menifield",
+  "b": "Brendson Ribeiro",
+  "when": "2026-09-27T00:00:00Z"
+ },
+ "no_books": {
+  "id": "evt10c0rn3rnobooks",
+  "a": "Amanda Lemos",
+  "b": "Angela Hill",
+  "when": "2026-09-27T01:00:00Z"
+ },
+ "unrated": {
+  "id": "evt11c0rn3runrated",
+  "a": "Kaito Unrecorded",
+  "b": "Beneil Dariush",
+  "when": "2026-09-27T01:00:00Z"
+ },
+ "other_promotion": {
+  "id": "evt12c0rn3rotherpromotion",
+  "a": "Andre Petroski",
+  "b": "Anthony Hernandez",
+  "when": "2026-09-27T01:00:00Z"
+ },
+ "card2_a": {
+  "id": "evt13c0rn3rcard2a",
+  "a": "Alex Perez",
+  "b": "Alexandre Pantoja",
+  "when": "2026-10-03T23:00:00Z"
+ },
+ "card2_b": {
+  "id": "evt14c0rn3rcard2b",
+  "a": "Alexa Grasso",
+  "b": "Casey O'Neill",
+  "when": "2026-10-03T23:00:00Z"
+ },
+ "card2_c": {
+  "id": "evt15c0rn3rcard2c",
+  "a": "Aiemann Zahabi",
+  "b": "Aoriqileng",
+  "when": "2026-10-04T00:00:00Z"
+ },
+ "under_way": {
+  "id": "evt16c0rn3runderway",
+  "a": "Benoit Saint Denis",
+  "b": "Billy Quarantillo",
+  "when": "2026-09-23T17:00:00Z"
+ },
+ "finished": {
+  "id": "evt17c0rn3rfinished",
+  "a": "Belal Muhammad",
+  "b": "Carlos Prates",
+  "when": "2026-09-23T10:00:00Z"
+ }
+}

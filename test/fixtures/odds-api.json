@@ -1,0 +1,2078 @@
+[
+ {
+  "id": "evt01c0rn3rmainpriced",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-26T22:00:00Z",
+  "home_team": "Alexander Hernandez",
+  "away_team": "Arman Tsarukyan",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Hernandez",
+        "price": 845
+       },
+       {
+        "name": "Arman Tsarukyan",
+        "price": -1550
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Hernandez",
+        "price": 795
+       },
+       {
+        "name": "Arman Tsarukyan",
+        "price": -1400
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Hernandez",
+        "price": 750
+       },
+       {
+        "name": "Arman Tsarukyan",
+        "price": -1275
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Hernandez",
+        "price": 710
+       },
+       {
+        "name": "Arman Tsarukyan",
+        "price": -1170
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Hernandez",
+        "price": 670
+       },
+       {
+        "name": "Arman Tsarukyan",
+        "price": -1080
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Hernandez",
+        "price": 635
+       },
+       {
+        "name": "Arman Tsarukyan",
+        "price": -1005
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt02c0rn3rthinrecord",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-26T22:00:00Z",
+  "home_team": "Aaron Pico",
+  "away_team": "Abus Magomedov",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Aaron Pico",
+        "price": -160
+       },
+       {
+        "name": "Abus Magomedov",
+        "price": 130
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Aaron Pico",
+        "price": -160
+       },
+       {
+        "name": "Abus Magomedov",
+        "price": 135
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Aaron Pico",
+        "price": -165
+       },
+       {
+        "name": "Abus Magomedov",
+        "price": 140
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Aaron Pico",
+        "price": -170
+       },
+       {
+        "name": "Abus Magomedov",
+        "price": 140
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Aaron Pico",
+        "price": -175
+       },
+       {
+        "name": "Abus Magomedov",
+        "price": 145
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Aaron Pico",
+        "price": -180
+       },
+       {
+        "name": "Abus Magomedov",
+        "price": 150
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt03c0rn3rlayoff",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-26T22:00:00Z",
+  "home_team": "Ange Loosa",
+  "away_team": "Alex Morono",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Ange Loosa",
+        "price": -135
+       },
+       {
+        "name": "Alex Morono",
+        "price": 115
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Ange Loosa",
+        "price": -140
+       },
+       {
+        "name": "Alex Morono",
+        "price": 115
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Ange Loosa",
+        "price": -145
+       },
+       {
+        "name": "Alex Morono",
+        "price": 120
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Ange Loosa",
+        "price": -145
+       },
+       {
+        "name": "Alex Morono",
+        "price": 120
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Ange Loosa",
+        "price": -150
+       },
+       {
+        "name": "Alex Morono",
+        "price": 125
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Ange Loosa",
+        "price": -155
+       },
+       {
+        "name": "Alex Morono",
+        "price": 130
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt04c0rn3rweightclassmove",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-26T23:00:00Z",
+  "home_team": "Alexander Volkanovski",
+  "away_team": "Adrian Yanez",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Volkanovski",
+        "price": -220
+       },
+       {
+        "name": "Adrian Yanez",
+        "price": 180
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Volkanovski",
+        "price": -225
+       },
+       {
+        "name": "Adrian Yanez",
+        "price": 185
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Volkanovski",
+        "price": -235
+       },
+       {
+        "name": "Adrian Yanez",
+        "price": 190
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Volkanovski",
+        "price": -240
+       },
+       {
+        "name": "Adrian Yanez",
+        "price": 195
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Volkanovski",
+        "price": -245
+       },
+       {
+        "name": "Adrian Yanez",
+        "price": 200
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Alexander Volkanovski",
+        "price": -255
+       },
+       {
+        "name": "Adrian Yanez",
+        "price": 205
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt05c0rn3rloosename",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-26T23:00:00Z",
+  "home_team": "Abd Al-Selwady",
+  "away_team": "Alessandro Costa",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Abd Al-Selwady",
+        "price": -100
+       },
+       {
+        "name": "Alessandro Costa",
+        "price": -120
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Abd Al-Selwady",
+        "price": -105
+       },
+       {
+        "name": "Alessandro Costa",
+        "price": -115
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Abd Al-Selwady",
+        "price": -105
+       },
+       {
+        "name": "Alessandro Costa",
+        "price": -115
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Abd Al-Selwady",
+        "price": -110
+       },
+       {
+        "name": "Alessandro Costa",
+        "price": -110
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Abd Al-Selwady",
+        "price": -110
+       },
+       {
+        "name": "Alessandro Costa",
+        "price": -110
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Abd Al-Selwady",
+        "price": -115
+       },
+       {
+        "name": "Alessandro Costa",
+        "price": -105
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt06c0rn3raccentname",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-26T23:00:00Z",
+  "home_team": "José Daniel Medina",
+  "away_team": "Adam Fugitt",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "José Daniel Medina",
+        "price": 250
+       },
+       {
+        "name": "Adam Fugitt",
+        "price": -315
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "José Daniel Medina",
+        "price": 245
+       },
+       {
+        "name": "Adam Fugitt",
+        "price": -305
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "José Daniel Medina",
+        "price": 235
+       },
+       {
+        "name": "Adam Fugitt",
+        "price": -295
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "José Daniel Medina",
+        "price": 230
+       },
+       {
+        "name": "Adam Fugitt",
+        "price": -285
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "José Daniel Medina",
+        "price": 225
+       },
+       {
+        "name": "Adam Fugitt",
+        "price": -280
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "José Daniel Medina",
+        "price": 215
+       },
+       {
+        "name": "Adam Fugitt",
+        "price": -270
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt07c0rn3rsharedname",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-27T00:00:00Z",
+  "home_team": "Mike Davis",
+  "away_team": "Axel Sola",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Mike Davis",
+        "price": -115
+       },
+       {
+        "name": "Axel Sola",
+        "price": -105
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Mike Davis",
+        "price": -115
+       },
+       {
+        "name": "Axel Sola",
+        "price": -105
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Mike Davis",
+        "price": -120
+       },
+       {
+        "name": "Axel Sola",
+        "price": -100
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Mike Davis",
+        "price": -125
+       },
+       {
+        "name": "Axel Sola",
+        "price": 100
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Mike Davis",
+        "price": -125
+       },
+       {
+        "name": "Axel Sola",
+        "price": 105
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Mike Davis",
+        "price": -130
+       },
+       {
+        "name": "Axel Sola",
+        "price": 105
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt08c0rn3rotherbooksonly",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-27T00:00:00Z",
+  "home_team": "Aleksandar Rakic",
+  "away_team": "Alexander Volkov",
+  "bookmakers": [
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Aleksandar Rakic",
+        "price": 185
+       },
+       {
+        "name": "Alexander Volkov",
+        "price": -225
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt09c0rn3rdkoneside",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-27T00:00:00Z",
+  "home_team": "Alonzo Menifield",
+  "away_team": "Brendson Ribeiro",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Alonzo Menifield",
+        "price": -160
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Alonzo Menifield",
+        "price": -230
+       },
+       {
+        "name": "Brendson Ribeiro",
+        "price": 185
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Alonzo Menifield",
+        "price": -235
+       },
+       {
+        "name": "Brendson Ribeiro",
+        "price": 190
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Alonzo Menifield",
+        "price": -245
+       },
+       {
+        "name": "Brendson Ribeiro",
+        "price": 195
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Alonzo Menifield",
+        "price": -250
+       },
+       {
+        "name": "Brendson Ribeiro",
+        "price": 205
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Alonzo Menifield",
+        "price": -260
+       },
+       {
+        "name": "Brendson Ribeiro",
+        "price": 210
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt10c0rn3rnobooks",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-27T01:00:00Z",
+  "home_team": "Amanda Lemos",
+  "away_team": "Angela Hill",
+  "bookmakers": []
+ },
+ {
+  "id": "evt11c0rn3runrated",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-27T01:00:00Z",
+  "home_team": "Kaito Unrecorded",
+  "away_team": "Beneil Dariush",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Kaito Unrecorded",
+        "price": -115
+       },
+       {
+        "name": "Beneil Dariush",
+        "price": -105
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Kaito Unrecorded",
+        "price": -120
+       },
+       {
+        "name": "Beneil Dariush",
+        "price": -100
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Kaito Unrecorded",
+        "price": -120
+       },
+       {
+        "name": "Beneil Dariush",
+        "price": 100
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Kaito Unrecorded",
+        "price": -125
+       },
+       {
+        "name": "Beneil Dariush",
+        "price": 105
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Kaito Unrecorded",
+        "price": -130
+       },
+       {
+        "name": "Beneil Dariush",
+        "price": 105
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Kaito Unrecorded",
+        "price": -130
+       },
+       {
+        "name": "Beneil Dariush",
+        "price": 110
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt12c0rn3rotherpromotion",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-27T01:00:00Z",
+  "home_team": "Andre Petroski",
+  "away_team": "Anthony Hernandez",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Andre Petroski",
+        "price": 335
+       },
+       {
+        "name": "Anthony Hernandez",
+        "price": -445
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Andre Petroski",
+        "price": 325
+       },
+       {
+        "name": "Anthony Hernandez",
+        "price": -425
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Andre Petroski",
+        "price": 315
+       },
+       {
+        "name": "Anthony Hernandez",
+        "price": -410
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Andre Petroski",
+        "price": 305
+       },
+       {
+        "name": "Anthony Hernandez",
+        "price": -395
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Andre Petroski",
+        "price": 295
+       },
+       {
+        "name": "Anthony Hernandez",
+        "price": -380
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Andre Petroski",
+        "price": 285
+       },
+       {
+        "name": "Anthony Hernandez",
+        "price": -370
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt13c0rn3rcard2a",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-10-03T23:00:00Z",
+  "home_team": "Alex Perez",
+  "away_team": "Alexandre Pantoja",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Alex Perez",
+        "price": 130
+       },
+       {
+        "name": "Alexandre Pantoja",
+        "price": -160
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Alex Perez",
+        "price": 130
+       },
+       {
+        "name": "Alexandre Pantoja",
+        "price": -155
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Alex Perez",
+        "price": 125
+       },
+       {
+        "name": "Alexandre Pantoja",
+        "price": -150
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Alex Perez",
+        "price": 125
+       },
+       {
+        "name": "Alexandre Pantoja",
+        "price": -150
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Alex Perez",
+        "price": 120
+       },
+       {
+        "name": "Alexandre Pantoja",
+        "price": -145
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Alex Perez",
+        "price": 115
+       },
+       {
+        "name": "Alexandre Pantoja",
+        "price": -140
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt14c0rn3rcard2b",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-10-03T23:00:00Z",
+  "home_team": "Alexa Grasso",
+  "away_team": "Casey O'Neill",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Alexa Grasso",
+        "price": 130
+       },
+       {
+        "name": "Casey O'Neill",
+        "price": -160
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Alexa Grasso",
+        "price": 130
+       },
+       {
+        "name": "Casey O'Neill",
+        "price": -155
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Alexa Grasso",
+        "price": 125
+       },
+       {
+        "name": "Casey O'Neill",
+        "price": -150
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Alexa Grasso",
+        "price": 120
+       },
+       {
+        "name": "Casey O'Neill",
+        "price": -145
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Alexa Grasso",
+        "price": 120
+       },
+       {
+        "name": "Casey O'Neill",
+        "price": -145
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Alexa Grasso",
+        "price": 115
+       },
+       {
+        "name": "Casey O'Neill",
+        "price": -140
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt15c0rn3rcard2c",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-10-04T00:00:00Z",
+  "home_team": "Aiemann Zahabi",
+  "away_team": "Aoriqileng",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Aiemann Zahabi",
+        "price": -405
+       },
+       {
+        "name": "Aoriqileng",
+        "price": 315
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Aiemann Zahabi",
+        "price": -425
+       },
+       {
+        "name": "Aoriqileng",
+        "price": 325
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Aiemann Zahabi",
+        "price": -440
+       },
+       {
+        "name": "Aoriqileng",
+        "price": 335
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Aiemann Zahabi",
+        "price": -460
+       },
+       {
+        "name": "Aoriqileng",
+        "price": 345
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Aiemann Zahabi",
+        "price": -475
+       },
+       {
+        "name": "Aoriqileng",
+        "price": 360
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Aiemann Zahabi",
+        "price": -500
+       },
+       {
+        "name": "Aoriqileng",
+        "price": 370
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt16c0rn3runderway",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-23T17:00:00Z",
+  "home_team": "Benoit Saint Denis",
+  "away_team": "Billy Quarantillo",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Benoit Saint Denis",
+        "price": -430
+       },
+       {
+        "name": "Billy Quarantillo",
+        "price": 330
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Benoit Saint Denis",
+        "price": -450
+       },
+       {
+        "name": "Billy Quarantillo",
+        "price": 340
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Benoit Saint Denis",
+        "price": -470
+       },
+       {
+        "name": "Billy Quarantillo",
+        "price": 350
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Benoit Saint Denis",
+        "price": -490
+       },
+       {
+        "name": "Billy Quarantillo",
+        "price": 365
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Benoit Saint Denis",
+        "price": -510
+       },
+       {
+        "name": "Billy Quarantillo",
+        "price": 380
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Benoit Saint Denis",
+        "price": -530
+       },
+       {
+        "name": "Billy Quarantillo",
+        "price": 390
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "id": "evt17c0rn3rfinished",
+  "sport_key": "mma_mixed_martial_arts",
+  "sport_title": "MMA",
+  "commence_time": "2026-09-23T10:00:00Z",
+  "home_team": "Belal Muhammad",
+  "away_team": "Carlos Prates",
+  "bookmakers": [
+   {
+    "key": "draftkings",
+    "title": "DraftKings",
+    "last_update": "2026-09-23T18:20:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:20:00Z",
+      "outcomes": [
+       {
+        "name": "Belal Muhammad",
+        "price": -100
+       },
+       {
+        "name": "Carlos Prates",
+        "price": -120
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanduel",
+    "title": "FanDuel",
+    "last_update": "2026-09-23T18:13:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:13:00Z",
+      "outcomes": [
+       {
+        "name": "Belal Muhammad",
+        "price": -105
+       },
+       {
+        "name": "Carlos Prates",
+        "price": -115
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betmgm",
+    "title": "BetMGM",
+    "last_update": "2026-09-23T18:06:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T18:06:00Z",
+      "outcomes": [
+       {
+        "name": "Belal Muhammad",
+        "price": -105
+       },
+       {
+        "name": "Carlos Prates",
+        "price": -110
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "williamhill_us",
+    "title": "Caesars",
+    "last_update": "2026-09-23T17:59:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:59:00Z",
+      "outcomes": [
+       {
+        "name": "Belal Muhammad",
+        "price": -110
+       },
+       {
+        "name": "Carlos Prates",
+        "price": -110
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "fanatics",
+    "title": "Fanatics",
+    "last_update": "2026-09-23T17:52:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:52:00Z",
+      "outcomes": [
+       {
+        "name": "Belal Muhammad",
+        "price": -110
+       },
+       {
+        "name": "Carlos Prates",
+        "price": -105
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "key": "betrivers",
+    "title": "BetRivers",
+    "last_update": "2026-09-23T17:45:00Z",
+    "markets": [
+     {
+      "key": "h2h",
+      "last_update": "2026-09-23T17:45:00Z",
+      "outcomes": [
+       {
+        "name": "Belal Muhammad",
+        "price": -115
+       },
+       {
+        "name": "Carlos Prates",
+        "price": -105
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+]
