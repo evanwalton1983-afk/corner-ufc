@@ -7,11 +7,16 @@ predicts any matchup you pick.
 
 ## Deploy to Netlify
 
-Drag this whole folder onto the drop zone at https://app.netlify.com/drop
+Drag the `deploy` folder, and only that folder, onto the drop zone at
+https://app.netlify.com/drop
 
-No build step, no environment variables, no dependencies.
+No build step, no environment variables, no dependencies. Bump `MODEL_VERSION`
+in `index.html` and `APP_VERSION` in `sw.js` together on every deploy, or the old
+shell keeps being served.
 
 ## What is in here
+
+The `deploy` folder holds only what the live site needs:
 
 | file | purpose |
 |---|---|
@@ -20,6 +25,60 @@ No build step, no environment variables, no dependencies.
 | `manifest.webmanifest` | installable app metadata |
 | `icon.png` | app icon |
 | `netlify.toml` | publish config and cache headers |
+
+Everything else is never deployed:
+
+| path | purpose |
+|---|---|
+| `docs/send-to-war-room-prompt.md` | the brief for the Send to War Room button |
+| `docs/warroom-import-1.0.schema.json` | the War Room import contract |
+| `docs/war-room-export-report.md` | what the export sends, what it cannot, and the test results |
+| `docs/sample-payload-corner_ufc-2026-09-26.json` | a full sample payload (real fighters and model numbers, made up card and prices) |
+| `test/` | the acceptance suite, frozen ufcstats files and fixtures |
+
+## Tests
+
+```
+npm install
+npx playwright install chromium   # once, for the browser handoff tests
+npm test
+```
+
+The suite boots the app in jsdom on frozen copies of the four ufcstats files
+with a frozen clock (2026-09-23 19:00 UTC) and a made up Odds API response, and:
+
+1. snapshots every displayed line in every tab, with and without prices, on a
+   fresh and a restored cache, and compares it to `test/baseline/before.json`,
+   taken from the 2.1.0 app before any change;
+2. checks the War Room payload against the contract schema, the War Room's own
+   import pipeline (when `../war-room` is checked out next door), and the Card
+   tab it came from;
+3. runs the handoff in real Chromium across three local origins.
+
+`node test/make-fixtures.mjs` rebuilds the Odds API and disagreement log
+fixtures from the frozen data; the committed ones are what the baseline used.
+
+## Send to War Room
+
+The Card tab has a **Send to War Room** button. Pick a card date, check the
+label (it defaults to `UFC <date>`), untick any fight from another promotion,
+and press it. Both fighters of every ticked fight Corner rates on that date, and
+that has not started, go to The War Room as one import (contract 1.0): Corner's
+probability, the Card's best price and book with the pull time, and the Card's
+warnings as flags. Fighters are named as in ufcstats, with the ufcstats fighter
+id, not with the Odds API spelling.
+
+The export opens the War Room receiver in a new tab and hands the file over,
+only to the receiver's exact origin and only after that tab says it is ready.
+If the tab is blocked or does not answer within 60 seconds, **Copy JSON** and
+**Download JSON** give the same file to import by hand. The receiver address is
+under Receiver and defaults to
+`https://lighthearted-kringle-dafe7e.netlify.app/import/receive`.
+
+The export only reads the model and changes no number the app shows. For the
+War Room to accept the handoff, this site's domain must be listed in
+`handoff_allowed_origins` in War Room Settings. Details are in
+`docs/war-room-export-report.md`.
 
 ## Why a matchup picker instead of a slate
 

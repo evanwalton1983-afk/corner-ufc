@@ -1,0 +1,1269 @@
+{
+  "contract": "warroom.import",
+  "contract_version": "1.0",
+  "batch": {
+    "source_batch_id": "corner_ufc-2026-UFC 2026-09-26-20260923T190000Z",
+    "source_app": "corner_ufc",
+    "model_name": "Corner UFC",
+    "model_version": "2.2.0",
+    "model_config": {
+      "rating": {
+        "R": 1.2279,
+        "P0": 1.296,
+        "q_game": 0.0954,
+        "q_layoff": 0.3974,
+        "q_movediv": 0.7521,
+        "P_max": 2.8167,
+        "defl": 1.0578,
+        "lr": 0.9877,
+        "b_reach": 0.0203,
+        "b_age": 0.0894,
+        "age_peak": 28.4392,
+        "b_lay": 0.1735,
+        "b_south": 0.0496
+      },
+      "feature_coefficients": {
+        "SLpM": 0.222252,
+        "SApM": -0.310144,
+        "strAcc": 0.723504,
+        "strDef": 2.256819,
+        "TD15": 0.260305,
+        "TDacc": -1.882751,
+        "TDdef": 2.010545,
+        "ctrl": -0.580924,
+        "KD15": -0.084602,
+        "sub15": -0.100638,
+        "finW": 0.507546,
+        "finL": -0.7699
+      },
+      "shrinkage": {
+        "K_MIN": 15,
+        "K_ATT": 60,
+        "K_N": 3
+      },
+      "scale": 1,
+      "fit_date": "2026-09-19",
+      "data_through": "2026-09-19",
+      "fighters_rated": 2752,
+      "thin_record_below_fights": 4,
+      "worth_researching_gap": 0.05,
+      "layoff_flag_days": 400,
+      "price_source": "odds_api",
+      "books": [
+        "DK",
+        "FD",
+        "MGM",
+        "CZR",
+        "FAN"
+      ],
+      "prices_pulled_at": "2026-09-23T19:00:00Z",
+      "price_engine_version": 1.1
+    },
+    "generated_at": "2026-09-23T19:00:00Z",
+    "is_backfill": false
+  },
+  "records": [
+    {
+      "record_id": "corner_ufc-evt01c0rn3rmainpriced-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt01c0rn3rmainpriced",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Alexander Hernandez",
+            "source_id": "262a7d06203657e6"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Arman Tsarukyan",
+            "source_id": "eae48ff31db420c2"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Alexander Hernandez"
+      },
+      "price": {
+        "american_odds": 845,
+        "opposite_american_odds": -1550,
+        "sportsbook": "DK",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.178096,
+        "prob_push": 0,
+        "prob_loss": 0.821904,
+        "projection": {
+          "prob_before_uncertainty": 0.100685,
+          "ufc_fights": 18,
+          "opponent_ufc_fights": 13,
+          "assumed_division": "Lightweight"
+        }
+      },
+      "flags": [
+        "worth_researching"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt01c0rn3rmainpriced-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt01c0rn3rmainpriced",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Alexander Hernandez",
+            "source_id": "262a7d06203657e6"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Arman Tsarukyan",
+            "source_id": "eae48ff31db420c2"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Arman Tsarukyan"
+      },
+      "price": {
+        "american_odds": -1080,
+        "opposite_american_odds": 670,
+        "sportsbook": "FAN",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.821904,
+        "prob_push": 0,
+        "prob_loss": 0.178096,
+        "projection": {
+          "prob_before_uncertainty": 0.899315,
+          "ufc_fights": 13,
+          "opponent_ufc_fights": 18,
+          "assumed_division": "Lightweight"
+        }
+      },
+      "flags": [
+        "worth_researching"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt02c0rn3rthinrecord-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt02c0rn3rthinrecord",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Aaron Pico",
+            "source_id": "5537efc6e496dd84"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Abus Magomedov",
+            "source_id": "36b8f265bcd1b7a4"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Aaron Pico"
+      },
+      "price": {
+        "american_odds": -160,
+        "opposite_american_odds": 130,
+        "sportsbook": "DK",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.584654,
+        "prob_push": 0,
+        "prob_loss": 0.415346,
+        "projection": {
+          "prob_before_uncertainty": 0.641069,
+          "ufc_fights": 2,
+          "opponent_ufc_fights": 8,
+          "assumed_division": "Middleweight"
+        }
+      },
+      "flags": [
+        "thin_record",
+        "weight_class_move"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt02c0rn3rthinrecord-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt02c0rn3rthinrecord",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Aaron Pico",
+            "source_id": "5537efc6e496dd84"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Abus Magomedov",
+            "source_id": "36b8f265bcd1b7a4"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Abus Magomedov"
+      },
+      "price": {
+        "american_odds": 145,
+        "opposite_american_odds": -175,
+        "sportsbook": "FAN",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.415346,
+        "prob_push": 0,
+        "prob_loss": 0.584654,
+        "projection": {
+          "prob_before_uncertainty": 0.358931,
+          "ufc_fights": 8,
+          "opponent_ufc_fights": 2,
+          "assumed_division": "Middleweight"
+        }
+      },
+      "flags": [
+        "thin_record",
+        "weight_class_move"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt03c0rn3rlayoff-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt03c0rn3rlayoff",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Ange Loosa",
+            "source_id": "1497e735d9f2560a"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Alex Morono",
+            "source_id": "cdb96af67d096b1e"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Ange Loosa"
+      },
+      "price": {
+        "american_odds": -135,
+        "opposite_american_odds": 115,
+        "sportsbook": "DK",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.50866,
+        "prob_push": 0,
+        "prob_loss": 0.49134,
+        "projection": {
+          "prob_before_uncertainty": 0.513637,
+          "ufc_fights": 5,
+          "opponent_ufc_fights": 23,
+          "assumed_division": "Welterweight"
+        }
+      },
+      "flags": [
+        "layoff",
+        "worth_researching"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt03c0rn3rlayoff-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt03c0rn3rlayoff",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Ange Loosa",
+            "source_id": "1497e735d9f2560a"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Alex Morono",
+            "source_id": "cdb96af67d096b1e"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Alex Morono"
+      },
+      "price": {
+        "american_odds": 125,
+        "opposite_american_odds": -150,
+        "sportsbook": "FAN",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.49134,
+        "prob_push": 0,
+        "prob_loss": 0.50866,
+        "projection": {
+          "prob_before_uncertainty": 0.486363,
+          "ufc_fights": 23,
+          "opponent_ufc_fights": 5,
+          "assumed_division": "Welterweight"
+        }
+      },
+      "flags": [
+        "layoff",
+        "worth_researching"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt04c0rn3rweightclassmove-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt04c0rn3rweightclassmove",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Alexander Volkanovski",
+            "source_id": "e1248941344b3288"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Adrian Yanez",
+            "source_id": "0232cabbc30a2372"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Alexander Volkanovski"
+      },
+      "price": {
+        "american_odds": -220,
+        "opposite_american_odds": 180,
+        "sportsbook": "DK",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.710217,
+        "prob_push": 0,
+        "prob_loss": 0.289783,
+        "projection": {
+          "prob_before_uncertainty": 0.829023,
+          "ufc_fights": 18,
+          "opponent_ufc_fights": 10,
+          "assumed_division": "Bantamweight"
+        }
+      },
+      "flags": [
+        "weight_class_move"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt04c0rn3rweightclassmove-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt04c0rn3rweightclassmove",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Alexander Volkanovski",
+            "source_id": "e1248941344b3288"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Adrian Yanez",
+            "source_id": "0232cabbc30a2372"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Adrian Yanez"
+      },
+      "price": {
+        "american_odds": 200,
+        "opposite_american_odds": -245,
+        "sportsbook": "FAN",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.289783,
+        "prob_push": 0,
+        "prob_loss": 0.710217,
+        "projection": {
+          "prob_before_uncertainty": 0.170977,
+          "ufc_fights": 10,
+          "opponent_ufc_fights": 18,
+          "assumed_division": "Bantamweight"
+        }
+      },
+      "flags": [
+        "weight_class_move"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt05c0rn3rloosename-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt05c0rn3rloosename",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Abdul-Kareem Al-Selwady",
+            "source_id": "597499ac7a5aac62"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Alessandro Costa",
+            "source_id": "3fa97913cfd205d3"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Abdul-Kareem Al-Selwady"
+      },
+      "price": {
+        "american_odds": -100,
+        "opposite_american_odds": -120,
+        "sportsbook": "DK",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.483749,
+        "prob_push": 0,
+        "prob_loss": 0.516251,
+        "projection": {
+          "prob_before_uncertainty": 0.470098,
+          "ufc_fights": 2,
+          "opponent_ufc_fights": 8,
+          "assumed_division": "Flyweight"
+        }
+      },
+      "flags": [
+        "thin_record",
+        "weight_class_move",
+        "name_matched_loosely"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt05c0rn3rloosename-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt05c0rn3rloosename",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Abdul-Kareem Al-Selwady",
+            "source_id": "597499ac7a5aac62"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Alessandro Costa",
+            "source_id": "3fa97913cfd205d3"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Alessandro Costa"
+      },
+      "price": {
+        "american_odds": -110,
+        "opposite_american_odds": -110,
+        "sportsbook": "CZR",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.516251,
+        "prob_push": 0,
+        "prob_loss": 0.483749,
+        "projection": {
+          "prob_before_uncertainty": 0.529902,
+          "ufc_fights": 8,
+          "opponent_ufc_fights": 2,
+          "assumed_division": "Flyweight"
+        }
+      },
+      "flags": [
+        "thin_record",
+        "weight_class_move",
+        "name_matched_loosely"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt06c0rn3raccentname-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt06c0rn3raccentname",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Jose Daniel Medina",
+            "source_id": "baa9be02c3e3e038"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Adam Fugitt",
+            "source_id": "a01a62132460a98d"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Jose Daniel Medina"
+      },
+      "price": {
+        "american_odds": 250,
+        "opposite_american_odds": -315,
+        "sportsbook": "DK",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.337664,
+        "prob_push": 0,
+        "prob_loss": 0.662336,
+        "projection": {
+          "prob_before_uncertainty": 0.241564,
+          "ufc_fights": 4,
+          "opponent_ufc_fights": 6,
+          "assumed_division": "Middleweight"
+        }
+      },
+      "flags": [
+        "weight_class_move"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt06c0rn3raccentname-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt06c0rn3raccentname",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Jose Daniel Medina",
+            "source_id": "baa9be02c3e3e038"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Adam Fugitt",
+            "source_id": "a01a62132460a98d"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Adam Fugitt"
+      },
+      "price": {
+        "american_odds": -280,
+        "opposite_american_odds": 225,
+        "sportsbook": "FAN",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.662336,
+        "prob_push": 0,
+        "prob_loss": 0.337664,
+        "projection": {
+          "prob_before_uncertainty": 0.758436,
+          "ufc_fights": 6,
+          "opponent_ufc_fights": 4,
+          "assumed_division": "Middleweight"
+        }
+      },
+      "flags": [
+        "weight_class_move"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt07c0rn3rsharedname-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt07c0rn3rsharedname",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Mike Davis"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Axel Sola",
+            "source_id": "1d2d98ddd05b38fb"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Mike Davis"
+      },
+      "price": {
+        "american_odds": -115,
+        "opposite_american_odds": -105,
+        "sportsbook": "DK",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.485094,
+        "prob_push": 0,
+        "prob_loss": 0.514906,
+        "projection": {
+          "prob_before_uncertainty": 0.478478,
+          "ufc_fights": 8,
+          "opponent_ufc_fights": 4,
+          "assumed_division": "Lightweight"
+        }
+      },
+      "flags": []
+    },
+    {
+      "record_id": "corner_ufc-evt07c0rn3rsharedname-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt07c0rn3rsharedname",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Mike Davis"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Axel Sola",
+            "source_id": "1d2d98ddd05b38fb"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Axel Sola"
+      },
+      "price": {
+        "american_odds": 105,
+        "opposite_american_odds": -125,
+        "sportsbook": "FAN",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.514906,
+        "prob_push": 0,
+        "prob_loss": 0.485094,
+        "projection": {
+          "prob_before_uncertainty": 0.521522,
+          "ufc_fights": 4,
+          "opponent_ufc_fights": 8,
+          "assumed_division": "Lightweight"
+        }
+      },
+      "flags": []
+    },
+    {
+      "record_id": "corner_ufc-evt08c0rn3rotherbooksonly-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt08c0rn3rotherbooksonly",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Aleksandar Rakic",
+            "source_id": "333b9e5c723ac873"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Alexander Volkov",
+            "source_id": "279566840aa55bf2"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Aleksandar Rakic"
+      },
+      "model": {
+        "prob_win": 0.344373,
+        "prob_push": 0,
+        "prob_loss": 0.655627,
+        "projection": {
+          "prob_before_uncertainty": 0.274588,
+          "ufc_fights": 12,
+          "opponent_ufc_fights": 19,
+          "assumed_division": "Heavyweight"
+        }
+      },
+      "flags": [
+        "no_price_in_app"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt08c0rn3rotherbooksonly-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt08c0rn3rotherbooksonly",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Aleksandar Rakic",
+            "source_id": "333b9e5c723ac873"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Alexander Volkov",
+            "source_id": "279566840aa55bf2"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Alexander Volkov"
+      },
+      "model": {
+        "prob_win": 0.655627,
+        "prob_push": 0,
+        "prob_loss": 0.344373,
+        "projection": {
+          "prob_before_uncertainty": 0.725412,
+          "ufc_fights": 19,
+          "opponent_ufc_fights": 12,
+          "assumed_division": "Heavyweight"
+        }
+      },
+      "flags": [
+        "no_price_in_app"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt09c0rn3rdkoneside-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt09c0rn3rdkoneside",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Alonzo Menifield",
+            "source_id": "a495f599e787614f"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Brendson Ribeiro",
+            "source_id": "49edd0d90f60fb7d"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Alonzo Menifield"
+      },
+      "price": {
+        "american_odds": -160,
+        "opposite_american_odds": null,
+        "sportsbook": "DK",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.703313,
+        "prob_push": 0,
+        "prob_loss": 0.296687,
+        "projection": {
+          "prob_before_uncertainty": 0.763923,
+          "ufc_fights": 18,
+          "opponent_ufc_fights": 8,
+          "assumed_division": "Light Heavyweight"
+        }
+      },
+      "flags": []
+    },
+    {
+      "record_id": "corner_ufc-evt09c0rn3rdkoneside-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt09c0rn3rdkoneside",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Alonzo Menifield",
+            "source_id": "a495f599e787614f"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Brendson Ribeiro",
+            "source_id": "49edd0d90f60fb7d"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Brendson Ribeiro"
+      },
+      "price": {
+        "american_odds": 205,
+        "opposite_american_odds": -250,
+        "sportsbook": "FAN",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.296687,
+        "prob_push": 0,
+        "prob_loss": 0.703313,
+        "projection": {
+          "prob_before_uncertainty": 0.236077,
+          "ufc_fights": 8,
+          "opponent_ufc_fights": 18,
+          "assumed_division": "Light Heavyweight"
+        }
+      },
+      "flags": []
+    },
+    {
+      "record_id": "corner_ufc-evt10c0rn3rnobooks-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt10c0rn3rnobooks",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Amanda Lemos",
+            "source_id": "3df5493bb279226f"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Angela Hill",
+            "source_id": "f0feeb2192937424"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Amanda Lemos"
+      },
+      "model": {
+        "prob_win": 0.480034,
+        "prob_push": 0,
+        "prob_loss": 0.519966,
+        "projection": {
+          "prob_before_uncertainty": 0.472833,
+          "ufc_fights": 16,
+          "opponent_ufc_fights": 30,
+          "assumed_division": "Women's Strawweight"
+        }
+      },
+      "flags": [
+        "no_price_in_app"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt10c0rn3rnobooks-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt10c0rn3rnobooks",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Amanda Lemos",
+            "source_id": "3df5493bb279226f"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Angela Hill",
+            "source_id": "f0feeb2192937424"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Angela Hill"
+      },
+      "model": {
+        "prob_win": 0.519966,
+        "prob_push": 0,
+        "prob_loss": 0.480034,
+        "projection": {
+          "prob_before_uncertainty": 0.527167,
+          "ufc_fights": 30,
+          "opponent_ufc_fights": 16,
+          "assumed_division": "Women's Strawweight"
+        }
+      },
+      "flags": [
+        "no_price_in_app"
+      ]
+    },
+    {
+      "record_id": "corner_ufc-evt12c0rn3rotherpromotion-moneyline-fighter_a",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt12c0rn3rotherpromotion",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Andre Petroski",
+            "source_id": "5f61780fe5e9b6d0"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Anthony Hernandez",
+            "source_id": "093e1f5bb73850be"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_a",
+        "label": "Andre Petroski"
+      },
+      "price": {
+        "american_odds": 335,
+        "opposite_american_odds": -445,
+        "sportsbook": "DK",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.271195,
+        "prob_push": 0,
+        "prob_loss": 0.728805,
+        "projection": {
+          "prob_before_uncertainty": 0.205143,
+          "ufc_fights": 13,
+          "opponent_ufc_fights": 13,
+          "assumed_division": "Middleweight"
+        }
+      },
+      "flags": []
+    },
+    {
+      "record_id": "corner_ufc-evt12c0rn3rotherpromotion-moneyline-fighter_b",
+      "sport": "UFC",
+      "league": "UFC",
+      "season": 2026,
+      "grouping": {
+        "type": "card",
+        "label": "UFC 2026-09-26"
+      },
+      "event": {
+        "source_event_id": "evt12c0rn3rotherpromotion",
+        "start_time": "2026-09-26T00:00:00Z",
+        "start_time_precision": "date",
+        "timezone": "America/New_York",
+        "participants": [
+          {
+            "role": "fighter_a",
+            "name": "Andre Petroski",
+            "source_id": "5f61780fe5e9b6d0"
+          },
+          {
+            "role": "fighter_b",
+            "name": "Anthony Hernandez",
+            "source_id": "093e1f5bb73850be"
+          }
+        ]
+      },
+      "market": {
+        "type": "moneyline",
+        "period": "full_event"
+      },
+      "selection": {
+        "side": "fighter_b",
+        "label": "Anthony Hernandez"
+      },
+      "price": {
+        "american_odds": -380,
+        "opposite_american_odds": 295,
+        "sportsbook": "FAN",
+        "captured_at": "2026-09-23T19:00:00Z"
+      },
+      "model": {
+        "prob_win": 0.728805,
+        "prob_push": 0,
+        "prob_loss": 0.271195,
+        "projection": {
+          "prob_before_uncertainty": 0.794857,
+          "ufc_fights": 13,
+          "opponent_ufc_fights": 13,
+          "assumed_division": "Middleweight"
+        }
+      },
+      "flags": []
+    }
+  ]
+}
