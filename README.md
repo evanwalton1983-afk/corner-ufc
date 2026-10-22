@@ -10,9 +10,9 @@ predicts any matchup you pick.
 Drag the `deploy` folder, and only that folder, onto the drop zone at
 https://app.netlify.com/drop
 
-No build step, no environment variables, no dependencies. Bump `MODEL_VERSION`
+No build step, no environment variables. The page loads two pinned, MIT licensed libraries from jsDelivr (glicko2 1.2.2, and openskill 5.0.1 only when ticked in Settings); without them everything else still works. Bump `MODEL_VERSION`
 in `index.html` and `APP_VERSION` in `sw.js` together on every deploy, or the old
-shell keeps being served.
+shell keeps being served, and add a dated line to `CHANGELOG.md`.
 
 ## What is in here
 
@@ -198,3 +198,16 @@ reference." Those two numbers were computed on different sets of fights, which
 made the comparison meaningless. It has been replaced with a calibration check
 comparing what the model claimed against what happened, on the same fights. Live
 closing prices are not in this data set, so no market number appears here at all.
+
+## Second opinion rating (2.3)
+
+A Glicko-2 rating of wins and losses only, shown beside Corner's number and never
+feeding it. Every fight is replayed in date order in monthly rating periods, so a
+fighter who is not fighting gets a larger rating deviation (RD). The win
+probability is the Glicko-2 expected score using both RDs. The confidence badge
+comes from the larger RD of the two fighters, against two cutoffs in Settings
+(defaults: High at 140 or below, Low above 200, measured on active fighters whose
+RDs run from about 115 to 210). The Send to War Room export carries
+`glicko2_prob_win`, `glicko2_confidence`, `glicko2_rd` and `glicko2_opponent_rd`
+in each record's `model.projection`, plus `openskill_prob_win` when the OpenSkill
+comparison is on. Run `node test/second-opinion.test.mjs` for its checks.

@@ -49,7 +49,7 @@ const B = build(w), P = B.payload, R = P.records;
 console.log('  panel: ' + count(w));
 ok(B.errors.length === 0, 'in-app validation passes: ' + B.errors.join('; '));
 ok(schemaOk(P), 'schema (ajv, draft 2020-12) passes: ' + ajv.errorsText(schemaOk.errors));
-ok(P.batch.source_app === 'corner_ufc' && P.batch.model_version === '2.2.0' && P.batch.model_name === 'Corner UFC', 'batch identity');
+ok(P.batch.source_app === 'corner_ufc' && P.batch.model_version === '2.3.0' && P.batch.model_name === 'Corner UFC', 'batch identity');
 ok(/^corner_ufc-2026-UFC 2026-09-26-\d{8}T\d{6}Z$/.test(P.batch.source_batch_id), 'source_batch_id format ' + P.batch.source_batch_id);
 ok(P.batch.generated_at === '2026-09-23T19:00:00Z', 'generated_at is the press time in UTC');
 ok(JSON.stringify(P.batch.model_config.rating) === w.eval('JSON.stringify(P)') && JSON.stringify(P.batch.model_config.feature_coefficients) === w.eval('JSON.stringify(FB)'), 'model_config carries P and FB as they are');
