@@ -2,7 +2,7 @@
    Bump APP_VERSION on every deploy of index.html, or the old shell keeps being
    served from cache. The ufcstats CSVs on GitHub and The Odds API are never handled here:
    the page caches both itself, with its own freshness rules and refresh buttons. */
-const APP_VERSION='2.2.0';
+const APP_VERSION='2.3.0';
 const CACHE='corner-'+APP_VERSION;
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon.png'];
 self.addEventListener('install',e=>{
@@ -14,7 +14,10 @@ self.addEventListener('activate',e=>{
 self.addEventListener('fetch',e=>{
   const req=e.request; if(req.method!=='GET') return;
   const url=new URL(req.url);
-  if(url.origin!==self.location.origin) return;   // GitHub data, The Odds API: the page handles those
+  /* The pinned rating libraries on jsDelivr are immutable, so they are cached like the shell and
+     the second opinion still works offline. GitHub data and The Odds API are the page's to handle. */
+  const pinnedLib=url.origin==='https://cdn.jsdelivr.net'&&url.pathname.startsWith('/npm/');
+  if(url.origin!==self.location.origin&&!pinnedLib) return;
   e.respondWith(caches.match(req).then(hit=>{
     const net=fetch(req).then(res=>{ if(res&&res.ok){const c=res.clone();caches.open(CACHE).then(x=>x.put(req,c));} return res; }).catch(()=>hit);
     return hit||net;

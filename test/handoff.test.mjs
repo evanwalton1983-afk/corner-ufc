@@ -118,7 +118,7 @@ console.log('\n[1] handoff to the right origin');
   ok(/^warroom-corner_ufc-ufc-2026-09-26-\d{8}T\d{6}Z\.json$/.test(dl.suggestedFilename()), 'file name warroom-<source_app>-<label>-<timestamp>.json');
 
   const hosts = [...new Set(requests.map(u => new URL(u).origin))].sort();
-  ok(hosts.every(h => [APP, RECV, 'https://raw.githubusercontent.com', 'https://api.the-odds-api.com'].includes(h)), 'requests only to: ' + hosts.join(', '));
+  ok(hosts.every(h => [APP, RECV, 'https://raw.githubusercontent.com', 'https://api.the-odds-api.com', 'https://cdn.jsdelivr.net'].includes(h)), 'requests only to: ' + hosts.join(', '));
   ok(errors.length === 0, 'zero JS errors ' + errors.join(' | '));
   await ctx.close();
 }
@@ -201,7 +201,7 @@ console.log('\n[6] service worker');
   const { ctx, page } = await openApp({ sw: 'allow', key: false });
   const keys = await page.evaluate(async () => { await navigator.serviceWorker.ready; for (let i = 0; i < 40; i++) {
     const k = await caches.keys(); if (k.length) return k; await new Promise(r => setTimeout(r, 100)); } return []; });
-  ok(keys.includes('corner-2.2.0'), 'cache ' + keys.join(','));
+  ok(keys.includes('corner-2.3.0'), 'cache ' + keys.join(','));
   await ctx.close();
 }
 

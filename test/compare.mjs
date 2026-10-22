@@ -8,7 +8,7 @@ import { ROOT } from './lib/boot.mjs';
 
 const [a, b] = [process.argv[2] || 'test/baseline/before.json', process.argv[3] || 'test/out/after.json']
   .map(f => JSON.parse(fs.readFileSync(path.resolve(ROOT, f), 'utf8')));
-const FROM = process.env.FROM_VERSION || '2.1.0', TO = process.env.TO_VERSION || '2.2.0';
+const FROM = process.env.FROM_VERSION || '2.1.0', TO = process.env.TO_VERSION || '2.3.0';
 const nums = s => JSON.stringify(s).match(/-?\d+(\.\d+)?%?/g) || [];
 
 let fail = 0, totalNums = 0, totalLines = 0, allowed = 0;

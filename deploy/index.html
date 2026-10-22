@@ -14,6 +14,7 @@
   --red:#D64541;     /* red corner, always fighter on the left */
   --blue:#4A86C8;    /* blue corner, always fighter on the right */
   --warn:#E0A43C;    /* uncertainty */
+  --ok:#4FA676;      /* high confidence */
   --r:10px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -136,8 +137,21 @@ tbody tr:hover{background:var(--surface)}
 .wr-set .wr-bar{margin:8px 0}
 footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
   font-size:12px;color:var(--dim);line-height:1.7}
+/* second opinion (2.3): a rating shown beside Corner's number, never replacing it */
+.so{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+.so h3{font-size:13px;font-weight:600;color:var(--mute);margin:0 0 6px}
+.so .probnums{font-size:20px}
+.so-meta{font-size:12.5px;color:var(--mute);line-height:1.7;margin-top:4px}
+.so-row{display:contents}
+.pill.hi{border-color:var(--ok,#3b9a5d);color:var(--ok,#3b9a5d)}
+.pill.lo{border-color:var(--warn);color:var(--warn)}
+.set-grid{display:grid;grid-template-columns:1fr 110px;gap:8px 12px;align-items:center;font-size:14px;margin-bottom:10px}
+.set-grid input[type=number]{width:100%}
+.set-grid input[type=checkbox]{min-height:0;width:22px;height:22px;padding:0;justify-self:start;accent-color:var(--warn)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:420px){
+  .tabs{gap:4px}
+  .tabs button{font-size:13px;padding:0 2px}
   .probnums{font-size:19px}
   .grid3{grid-template-columns:repeat(2,1fr)}
   .drow{grid-template-columns:92px 1fr 50px}
@@ -157,6 +171,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
   <button id="tabRank">Rankings</button>
   <button id="tabLog">Recent</button>
   <button id="tabCard">Card</button>
+  <button id="tabSettings">Settings</button>
 </div>
 
 <section id="matchView">
@@ -205,6 +220,10 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
   <div id="card"></div>
 </section>
 
+<section id="settingsView" style="display:none">
+  <div id="settings"></div>
+</section>
+
 <footer>
   <div id="foot1"></div>
   <div id="foot2" style="margin-top:6px"></div>
@@ -216,6 +235,13 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
 
 </div>
 
+<!-- Second opinion rating. Pinned versions, MIT licensed, loaded from the CDN, nothing built.
+     glicko2js 1.2.2 by Henri Bourcereau, https://github.com/mmai/glicko2js
+     The MIT License (MIT), Copyright (c) <year> <copyright holders>, exactly as published in its LICENSE.md.
+     The page works without it: the second opinion is simply not shown. -->
+<script src="https://cdn.jsdelivr.net/npm/glicko2@1.2.2/glicko2.js"
+  integrity="sha384-m0X2LzqyUrbsd6IGP2YBJMOVPBNQbfD7e+dU2Adi4PEVUSPLJiRh9VtT1RgI7Fhg"
+  crossorigin="anonymous"></script>
 <script>
 /* ============================================================
    CORNER MODEL
@@ -275,7 +301,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
       name it had not seen.
    ============================================================ */
 
-const MODEL_VERSION='2.2.0';
+const MODEL_VERSION='2.3.0';
 const FIT_DATE='2026-09-19';
 
 /* Rating parameters from the offline reference, unchanged. */
@@ -595,14 +621,109 @@ function build(d){
 
 function fit(fights){
   const m=new UFCModel(); const log=[];
+  /* The fight list for the second opinion ratings, kept as small arrays so it
+     can sit in the fit cache: names once, then [fighter, fighter, ms, y]. */
+  const rp={names:[],rows:[]}, rix=new Map();
+  const rid=n=>{let i=rix.get(n);if(i===undefined){i=rp.names.length;rp.names.push(n);rix.set(n,i);}return i;};
   const cutoff=fights.length?new Date(fights[fights.length-1].date-400*864e5):null;
   for(const g of fights){
     const d=m.detail(g.f1,g.f2,g.date,g.div,attOf);
     if(cutoff&&g.date>=cutoff&&d.n1>=1&&d.n2>=1)
       log.push({f1:g.f1,f2:g.f2,date:+g.date,div:g.div,y:g.y,p:d.p});
     m.update(g,d);
+    rp.rows.push([rid(g.f1),rid(g.f2),+g.date,g.y]);
   }
-  return{m,log};
+  return{m,log,replay:rp};
+}
+
+/* ============================================================
+   SECOND OPINION  (2.3)
+
+   A separate rating of wins and losses only, shown beside Corner's number.
+   It never feeds Corner's forecast and changes no number Corner shows.
+
+   Glicko-2, by the glicko2 library (mmai/glicko2js, MIT). Every fight in
+   Corner's history is replayed in date order in monthly rating periods. A
+   fighter who does not fight in a month still goes through that period, so
+   his rating deviation (RD) grows while he is out. For a fight after the
+   last month in the data, the same growth is applied for the empty months in
+   between. The win probability is the Glicko-2 expected score using both
+   deviations, g(sqrt(RD1^2 + RD2^2)), the same formula as Player.predict in
+   the library. Confidence comes from the larger of the two RDs, against the
+   two cutoffs in Settings.
+
+   OpenSkill (philihp/openskill.js, MIT) is an optional comparison, loaded
+   from the CDN only when switched on in Settings.
+   ============================================================ */
+const GL_S=173.7178, GL_TAU=0.5;
+const OS_URL='https://cdn.jsdelivr.net/npm/openskill@5.0.1/+esm';
+const SO_KEY='corner.rating.v1';
+const SO_DEFAULT={hi:140,lo:200,os:false};   // RD cutoffs, in rating points
+let SO_S=soLoad(), SO_GL=null, OS_MAP=null, OS_MOD=null, REPLAY=null, OS_STATE='off';   // OS_STATE: off, loading, ready, failed
+function soLoad(){
+  try{const o=JSON.parse(localStorage.getItem(SO_KEY)||'null');
+    if(o&&o.hi>0&&o.lo>o.hi) return{hi:+o.hi,lo:+o.lo,os:!!o.os};
+    if(o) return{...SO_DEFAULT,os:!!o.os};
+  }catch(e){}
+  return{...SO_DEFAULT};
+}
+function soSave(){ try{localStorage.setItem(SO_KEY,JSON.stringify(SO_S));}catch(e){} }
+
+const glMonth=t=>{const d=new Date(t);return d.getUTCFullYear()*12+d.getUTCMonth();};
+function glBuild(R){
+  if(typeof glicko2==='undefined'||!glicko2.Glicko2||!R||!R.rows.length) return null;
+  const G=new glicko2.Glicko2({tau:GL_TAU,rating:1500,rd:350,vol:0.06});
+  const pl=new Array(R.names.length).fill(null);
+  const get=i=>pl[i]||(pl[i]=G.makePlayer());
+  let cur=glMonth(R.rows[0][2]), batch=[];
+  for(const[i,j,t,y]of R.rows){
+    const m=glMonth(t);
+    while(cur<m){G.updateRatings(batch);batch=[];cur++;}
+    batch.push([get(i),get(j),y]);
+  }
+  G.updateRatings(batch);
+  const map=new Map();
+  pl.forEach((p,i)=>{if(p)map.set(R.names[i],{r:p.getRating(),rd:p.getRd(),vol:p.getVol()});});
+  return{through:cur,map};
+}
+function glState(name,steps){
+  const s=SO_GL.map.get(name)||{r:1500,rd:350,vol:0.06};
+  let phi=s.rd/GL_S;
+  for(let k=0;k<steps;k++) phi=Math.sqrt(phi*phi+s.vol*s.vol);
+  return{mu:(s.r-1500)/GL_S,phi,r:s.r,rd:phi*GL_S};
+}
+const glG=phi=>1/Math.sqrt(1+3*phi*phi/(Math.PI*Math.PI));
+const soBand=rd=>rd<=SO_S.hi?'high':rd<=SO_S.lo?'medium':'low';
+const soLabel={high:'High confidence',medium:'Medium confidence',low:'Low confidence'};
+/* a's chance of beating b on the given date, or null when the rating is not available */
+function glPair(a,b,when){
+  if(!SO_GL) return null;
+  const steps=Math.max(0,glMonth(when)-SO_GL.through-1);
+  const A=glState(a,steps), B=glState(b,steps);
+  const p=1/(1+Math.exp(-glG(Math.sqrt(A.phi*A.phi+B.phi*B.phi))*(A.mu-B.mu)));
+  return{p,rA:A.r,rB:B.r,rdA:A.rd,rdB:B.rd,conf:soBand(Math.max(A.rd,B.rd))};
+}
+
+async function osEnsure(){
+  if(!SO_S.os||OS_MAP||OS_STATE==='loading'||!REPLAY) return;
+  OS_STATE='loading';
+  try{
+    const mod=(typeof openskill!=='undefined'&&openskill)||await import(OS_URL);
+    const map=new Map(), get=n=>map.get(n)||(map.set(n,mod.rating()),map.get(n));
+    for(const[i,j,t,y]of REPLAY.rows){
+      const a=REPLAY.names[i], b=REPLAY.names[j];
+      const[[ra],[rb]]=mod.rate([[get(a)],[get(b)]],{rank:y===1?[1,2]:[2,1]});
+      map.set(a,ra); map.set(b,rb);
+    }
+    OS_MAP=map; OS_MOD=mod; OS_STATE='ready';
+  }catch(e){ OS_STATE='failed'; }
+  if(typeof soRerender==='function') soRerender();
+}
+/* a's chance of beating b, or null when OpenSkill is off, loading or failed */
+function osPair(a,b){
+  if(!SO_S.os||OS_STATE!=='ready') return null;
+  const mod=OS_MOD, get=n=>OS_MAP.get(n)||mod.rating();
+  return mod.predictWin([[get(a)],[get(b)]])[0];
 }
 
 /* ============================================================
@@ -811,6 +932,7 @@ function renderCard(){
       ${r.d?`<div class="cr-grid">
           <span>Corner</span><b class="l">${pc(r.d.p)}</b><b class="r">${pc(1-r.d.p)}</b>
           <span>Market, no vig</span><b>${r.nvA!=null?pc(r.nvA):'n/a'}</b><b>${r.nvA!=null?pc(1-r.nvA):'n/a'}</b>
+          ${soCardRows(r.a,r.b,r.when)}
           <span>Best price</span><b>${r.bestA?amer(r.bestA.v)+' '+peShort(r.bestA.k):'n/a'}</b><b>${r.bestB?amer(r.bestB.v)+' '+peShort(r.bestB.k):'n/a'}</b>
         </div>
         <div class="cr-foot">${gap!=null?`Corner is ${(100*Math.abs(gap)).toFixed(1)} pts higher than the market on ${esc(gap>=0?r.nameA:r.nameB)}${flag?' <span class="pill">worth researching</span>':''}`:''}
@@ -849,6 +971,58 @@ const $=id=>document.getElementById(id);
 const pc=x=>(100*x).toFixed(1)+'%';
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const iso=d=>new Date(d).toISOString().slice(0,10);
+
+/* ---- second opinion: views ---- */
+function soPill(c){ return `<span class="pill ${c==='high'?'hi':c==='low'?'lo':''}">${soLabel[c]}</span>`; }
+const soAgree=(pc_,pg)=>(pc_>.5)===(pg>.5);
+function soMatchup(a,b,when,pCorner){
+  const g=glPair(a,b,when); if(!g) return '';
+  const os=osPair(a,b);
+  return `<div class="so" data-so>
+    <h3>Second opinion: Glicko-2 rating ${soPill(g.conf)}</h3>
+    <div class="probnums"><span class="l">${pc(g.p)}</span><span class="r">${pc(1-g.p)}</span></div>
+    <div class="so-meta">Rating ${Math.round(g.rA)} &plusmn; ${Math.round(g.rdA)} against ${Math.round(g.rB)} &plusmn; ${Math.round(g.rdB)}.
+      ${soAgree(pCorner,g.p)?'Picks the same fighter as Corner.':'<b>Picks the other fighter than Corner.</b>'}
+      ${os!=null?`<br>OpenSkill: ${pc(os)} / ${pc(1-os)}`:(SO_S.os&&OS_STATE==='loading'?'<br>OpenSkill is loading.':(SO_S.os&&OS_STATE==='failed'?'<br>OpenSkill could not be loaded.':''))}
+      <br>Built from wins and losses alone. Corner's forecast above is unchanged by it.</div>
+  </div>`;
+}
+function soCardRows(a,b,when){
+  const g=glPair(a,b,when); if(!g) return '';
+  const os=osPair(a,b);
+  return `<div class="so-row" data-so><span>Glicko-2 ${soPill(g.conf)}</span><b class="l">${pc(g.p)}</b><b class="r">${pc(1-g.p)}</b></div>`
+    +(os!=null?`<div class="so-row" data-so><span>OpenSkill</span><b class="l">${pc(os)}</b><b class="r">${pc(1-os)}</b></div>`:'');
+}
+function renderSettings(){
+  const el=$('settings');
+  el.innerHTML=`<div class="so" style="border:0;margin:0;padding:0" data-so>
+    <h3 style="font-size:15px;color:var(--ink)">Second opinion rating</h3>
+    <p class="note" style="padding:0 0 10px">Glicko-2 is rated from wins and losses alone, in monthly rating periods,
+    and shown beside Corner's number. <b>RD</b> is its rating deviation: the smaller it is, the better the rating
+    is known. It grows for every month a fighter is out. Confidence uses the larger of the two fighters' RDs.
+    ${SO_GL?'':'<b class="err">The Glicko-2 library did not load, so the second opinion is hidden. Check the connection and reload.</b>'}</p>
+    <div class="set-grid">
+      <label for="soHi">High confidence when both RDs are at most</label><input id="soHi" type="number" inputmode="numeric" min="1" step="1" value="${SO_S.hi}">
+      <label for="soLo">Low confidence when either RD is above</label><input id="soLo" type="number" inputmode="numeric" min="1" step="1" value="${SO_S.lo}">
+      <label for="soOs">Also compare OpenSkill</label><input id="soOs" type="checkbox"${SO_S.os?' checked':''}>
+    </div>
+    <p id="soMsg" class="note err" style="padding:0 0 8px"></p>
+    <button id="soReset">Reset to defaults</button>
+    <p class="note" style="padding:12px 0 0">Between the two cutoffs the badge reads Medium. A new fighter starts at RD 350.
+    OpenSkill is loaded from the CDN only while this is ticked, and adds a second line next to Glicko-2.</p>
+  </div>`;
+  const msg=$('soMsg');
+  const apply=()=>{
+    const hi=+$('soHi').value, lo=+$('soLo').value;
+    if(!(hi>0&&lo>hi)){ msg.textContent='The low confidence cutoff must be larger than the high confidence cutoff.'; return; }
+    msg.textContent=''; SO_S.hi=hi; SO_S.lo=lo; soSave();
+  };
+  $('soHi').oninput=apply; $('soLo').oninput=apply;
+  $('soOs').onchange=e=>{ SO_S.os=e.target.checked; soSave(); if(SO_S.os) osEnsure(); };
+  $('soReset').onclick=()=>{ SO_S={...SO_DEFAULT,os:SO_S.os}; soSave(); renderSettings(); };
+}
+/* a finished OpenSkill load redraws whatever tab is showing */
+function soRerender(){ if(VIEW==='match') { if(comboA) drawVerdict(); } else if(VIEW==='card') renderCard(); else if(VIEW==='settings') renderSettings(); }
 
 function makeCombo(rootId,initial,onPick){
   const root=$(rootId);
@@ -993,6 +1167,7 @@ function drawVerdict(){
       :(Math.abs(d.pRaw-d.p)>0.03?`<div class="flag">Raw read was ${pc(d.pRaw)}, pulled to
       ${pc(d.p)} for uncertainty in the two records.</div>`:'')}
     ${divWarn}
+    ${soMatchup(a,bn,when,d.p)}
     <div class="drivers">
       <h3>What is driving it</h3>
       ${bars.map(([lab,v])=>{
@@ -1225,6 +1400,15 @@ function wrRecords(r,day,label){
     const bk=books.find(b=>b.key===best.k), o=bk?bk.h2h[oppName]:null;
     return {american_odds:best.v,opposite_american_odds:o==null?null:o,sportsbook:peShort(best.k),captured_at:wrIso(PE_DATA.at)};
   };
+  /* second opinion, from each fighter's side. Absent when the rating is not available. */
+  const g2=glPair(r.a,r.b,when), os=osPair(r.a,r.b);
+  const second=(first)=>{
+    const o={};
+    if(g2){ o.glicko2_prob_win=wr6(first?g2.p:1-g2.p); o.glicko2_confidence=g2.conf;
+      o.glicko2_rd=Math.round(10*(first?g2.rdA:g2.rdB))/10; o.glicko2_opponent_rd=Math.round(10*(first?g2.rdB:g2.rdA))/10; }
+    if(os!=null) o.openskill_prob_win=wr6(first?os:1-os);
+    return o;
+  };
   const part=(role,name)=>{ const id=WR_IDS&&WR_IDS.get(name); return id?{role,name,source_id:id}:{role,name}; };
   const event={source_event_id:r.ev.id,start_time:day+'T00:00:00Z',start_time_precision:'date',timezone:WR_TZ,
     participants:[part('fighter_a',r.a),part('fighter_b',r.b)]};
@@ -1236,7 +1420,7 @@ function wrRecords(r,day,label){
         grouping:{type:'card',label},event,market:{type:'moneyline',period:'full_event'},selection:{side,label:name}};
       if(pr) rec.price=pr;
       rec.model={prob_win:wr6(p),prob_push:0,prob_loss:wr6(1-p),
-        projection:{prob_before_uncertainty:wr6(raw),ufc_fights:n,opponent_ufc_fights:on,assumed_division:dv}};
+        projection:{prob_before_uncertainty:wr6(raw),ufc_fights:n,opponent_ufc_fights:on,assumed_division:dv,...second(side==='fighter_a')}};
       rec.flags=flags;
       return rec;
     });
@@ -1250,7 +1434,7 @@ function wrBuild(){
   if(!g) return {payload:null,errors:['Nothing to send: no fight Corner rates on the card is still to come.']};
   const label=wrLabel(g.day), ticked=g.fights.filter(r=>!WR_OFF.has(r.ev.id));
   const key=[g.day,label,PE_DATA&&PE_DATA.at,+THROUGH,M.f.size,PE_S.mine.join(','),WR_IDS?WR_IDS.size:-1,
-    ticked.map(r=>r.ev.id).join(',')].join('|');
+    ticked.map(r=>r.ev.id).join(','),JSON.stringify(SO_S),SO_GL?SO_GL.map.size:0,OS_STATE].join('|');
   if(WR_LAST&&WR_LAST.key===key) return WR_LAST;
   const now=Date.now(), records=[];
   for(const r of ticked) records.push(...wrRecords(r,g.day,label));
@@ -1261,7 +1445,10 @@ function wrBuild(){
         fit_date:FIT_DATE,data_through:iso(THROUGH),fighters_rated:M.f.size,
         thin_record_below_fights:4,worth_researching_gap:0.05,layoff_flag_days:WR_LAYOFF_DAYS,
         price_source:'odds_api',books:PE_S.mine.map(peShort),prices_pulled_at:PE_DATA&&PE_DATA.at?wrIso(PE_DATA.at):null,
-        price_engine_version:PE_VERSION},
+        price_engine_version:PE_VERSION,
+        second_opinion:SO_GL?{glicko2:{library:'glicko2@1.2.2',rating_period:'month',tau:GL_TAU,
+          confidence_rd_high_at_most:SO_S.hi,confidence_rd_low_above:SO_S.lo},
+          openskill:SO_S.os&&OS_STATE==='ready'?{library:'openskill@5.0.1'}:null}:null},
       generated_at:wrIso(now),is_backfill:false},
     records};
   const errors=records.length?wrValidate(payload):['Nothing to send: every fight on this card date is unticked.'];
@@ -1316,6 +1503,9 @@ function wrValidate(Pl){
     const m=r.model||{};
     if(!inU(m.prob_win)||!inU(m.prob_push)||!inU(m.prob_loss)) e('probabilities must be between 0 and 1');
     else if(Math.abs(m.prob_win+m.prob_push+m.prob_loss-1)>0.001) e('probabilities do not sum to 1');
+    const pj=m.projection||{};
+    if(pj.glicko2_prob_win!==undefined&&(!inU(pj.glicko2_prob_win)||!['high','medium','low'].includes(pj.glicko2_confidence))) e('glicko2 fields invalid');
+    if(pj.openskill_prob_win!==undefined&&!inU(pj.openskill_prob_win)) e('openskill_prob_win invalid');
   });
   return E;
 }
@@ -1443,26 +1633,29 @@ function switchView(v){
   $('rankView').style.display=v==='rank'?'':'none';
   $('logView').style.display=v==='log'?'':'none';
   $('cardView').style.display=v==='card'?'':'none';
+  $('settingsView').style.display=v==='settings'?'':'none';
   $('tabMatch').classList.toggle('on',v==='match');
   $('tabRank').classList.toggle('on',v==='rank');
   $('tabLog').classList.toggle('on',v==='log');
   $('tabCard').classList.toggle('on',v==='card');
+  $('tabSettings').classList.toggle('on',v==='settings');
   if(v==='match')renderMatch();
   if(v==='rank')renderRank();
   if(v==='log')renderLog();
   if(v==='card')renderCard();
+  if(v==='settings')renderSettings();
 }
 
 function packFit(){
   return{v:MODEL_VERSION,through:+THROUGH,
-    model:M.snapshot(),log:LOG,divs:DIVS,medreach:MEDREACH,
+    model:M.snapshot(),log:LOG,divs:DIVS,medreach:MEDREACH,replay:REPLAY,
     att:[...ATT].map(([k,a])=>[k,{reach:isFinite(a.reach)?a.reach:null,stance:a.stance,dob:a.dob?+a.dob:null}]),
     fmeta:[...FMETA].map(([k,m])=>[k,{n:m.n,div:m.div,last:m.last}])};
 }
 function unpackFit(c){
-  if(!c||c.v!==MODEL_VERSION||!Array.isArray(c.att))return false;
+  if(!c||c.v!==MODEL_VERSION||!Array.isArray(c.att)||!c.replay)return false;
   try{
-    M=UFCModel.from(c.model);LOG=c.log;DIVS=c.divs;MEDREACH=c.medreach;
+    M=UFCModel.from(c.model);LOG=c.log;DIVS=c.divs;MEDREACH=c.medreach;REPLAY=c.replay;
     FMETA=new Map(c.fmeta);
     ATT=new Map(c.att.map(([k,a])=>[k,{reach:a.reach==null?NaN:a.reach,stance:a.stance,dob:a.dob==null?null:new Date(a.dob)}]));
     NAMES=[...FMETA.keys()].sort((a,b)=>a.localeCompare(b));
@@ -1502,7 +1695,7 @@ async function boot(force){
     if(!ok){
       const F=build(d);
       if(!F.length)throw new Error('No completed fights parsed from the upstream files.');
-      const r=fit(F); M=r.m; LOG=r.log;
+      const r=fit(F); M=r.m; LOG=r.log; REPLAY=r.replay;
       THROUGH=F[F.length-1].date;
       indexFighters(F);
       cacheSet(FITKEY,Object.assign(packFit(),{rawAt:d.at}));
@@ -1510,6 +1703,10 @@ async function boot(force){
     } else FIT_CACHED=true;
     FIT_MS=Math.round(performance.now()-t0);
     F_INDEX=null;
+    /* second opinion: replayed on every load from the cached fight list. If the
+       library did not load or the replay fails, the feature is simply absent. */
+    try{ SO_GL=glBuild(REPLAY); }catch(e){ SO_GL=null; }
+    OS_MAP=null; OS_STATE='off'; osEnsure();
 
     $('rankDiv').innerHTML=['All divisions',...DIVS].map(x=>`<option>${esc(x)}</option>`).join('');
     $('rankDiv').onchange=renderRank;
@@ -1541,6 +1738,7 @@ $('tabMatch').onclick=()=>switchView('match');
 $('tabRank').onclick=()=>switchView('rank');
 $('tabLog').onclick=()=>switchView('log');
 $('tabCard').onclick=()=>switchView('card');
+$('tabSettings').onclick=()=>switchView('settings');
 $('refresh2').onclick=async e=>{e.target.disabled=true;e.target.textContent='...';
   await boot(true);e.target.disabled=false;e.target.textContent='Refresh';};
 loadSnaps().catch(()=>{}).then(()=>boot(false)).then(()=>{ if(PE_S.key) return refreshPrices(false); });

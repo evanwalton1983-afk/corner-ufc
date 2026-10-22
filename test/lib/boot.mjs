@@ -7,6 +7,13 @@ import { JSDOM, VirtualConsole } from 'jsdom';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+const require_ = createRequire(import.meta.url);
+/* The page loads glicko2 from the CDN and openskill on demand. jsdom loads no
+   external scripts, so the same pinned packages are put on the window here. */
+const GLICKO_SRC = fs.readFileSync(require_.resolve('glicko2/glicko2.js'), 'utf8');
+const OPENSKILL = await import('openskill');
+
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(here, '..', '..');
@@ -52,6 +59,7 @@ export async function bootApp({ mode = 'bare', htmlFile = path.join(APP_DIR, 'in
       }
       w.Date = FakeDate;
       w.performance.now = () => 0;
+      if (!process.env.NO_GLICKO) { w.eval(GLICKO_SRC); w.openskill = OPENSKILL; }
       Object.defineProperty(w, 'innerWidth', { value: width, configurable: true });
       w.addEventListener('error', ev => errors.push('window.error: ' + (ev.error && ev.error.stack || ev.message)));
       w.addEventListener('unhandledrejection', ev => errors.push('unhandledrejection: ' + (ev.reason && ev.reason.stack || ev.reason)));
@@ -105,7 +113,8 @@ export async function waitFor(fn, ms = 10000, why = () => '') {
 /* Everything a view displays, as lines of text in document order. Input and
    select values are included. Password inputs are skipped. Anything marked
    data-wr (the new War Room panel) is left out: it is new UI, and everything
-   else must be unchanged by its arrival. */
+   else must be unchanged by its arrival. data-so marks the second opinion
+   rating in the same way. */
 const BLOCK = new Set(['DIV', 'P', 'TR', 'TD', 'TH', 'H1', 'H2', 'H3', 'LABEL', 'BR', 'TABLE', 'TBODY', 'THEAD', 'SECTION', 'HEADER', 'FOOTER']);
 export function visibleLines(root) {
   const out = [];
@@ -114,7 +123,7 @@ export function visibleLines(root) {
   const walk = n => {
     if (n.nodeType === 3) { cur += n.nodeValue; return; }
     if (n.nodeType !== 1) return;
-    if (n.hasAttribute && n.hasAttribute('data-wr')) return;
+    if (n.hasAttribute && (n.hasAttribute('data-wr') || n.hasAttribute('data-so'))) return;
     const tag = n.tagName;
     if (tag === 'SCRIPT' || tag === 'STYLE') return;
     if (tag === 'INPUT') { if (n.type === 'checkbox') cur += n.checked ? ' [x] ' : ' [ ] '; else if (n.type !== 'password') cur += ` [${n.value}] `; return; }
@@ -132,7 +141,7 @@ export function visibleLines(root) {
 
 /* Style widths carry the probability bars, so they are numbers on screen too. */
 export function barWidths(root) {
-  return [...root.querySelectorAll('[style*="width"]')].filter(e => !e.closest('[data-wr]'))
+  return [...root.querySelectorAll('[style*="width"]')].filter(e => !e.closest('[data-wr]') && !e.closest('[data-so]'))
     .map(e => (e.getAttribute('style').match(/width:\s*[\d.]+%/g) || []).join(' ')).filter(Boolean);
 }
 
