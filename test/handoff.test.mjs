@@ -18,6 +18,8 @@ const ROLES = JSON.parse(fs.readFileSync(path.join(FIX, 'roles.json'), 'utf8'));
 const APP = 'http://127.0.0.1:8821', RECV = 'http://localhost:8822', IMP = 'http://localhost:8823';
 const OUT = path.join(ROOT, 'test', 'out'); fs.mkdirSync(OUT, { recursive: true });
 const CORS = { 'access-control-allow-origin': '*', 'access-control-expose-headers': 'x-requests-remaining' };
+// The pinned glicko2 build from node_modules stands in for jsDelivr, so the suite needs no network.
+const GLICKO = fs.readFileSync(path.join(ROOT, 'node_modules', 'glicko2', 'glicko2.js'), 'utf8');
 
 // Mock receiver: the same protocol as The War Room's receiver. Ready goes out
 // with '*' (no data in it); the payload is only accepted from the opener.
@@ -67,6 +69,8 @@ async function openApp({ receiver, width = 1280, sw = 'block', key = true }) {
   ctx.on('request', r => requests.push(r.url()));
   await ctx.route(/^https:\/\/raw\.githubusercontent\.com\/Greco1899\/scrape_ufc_stats\/main\/(\w+)\.csv$/,
     r => r.fulfill({ status: 200, body: CSV[r.request().url().match(/(\w+)\.csv$/)[1]], contentType: 'text/plain', headers: CORS }));
+  await ctx.route(/^https:\/\/cdn\.jsdelivr\.net\/npm\/glicko2@1\.2\.2\/glicko2\.js$/,
+    r => r.fulfill({ status: 200, body: GLICKO, contentType: 'text/javascript', headers: CORS }));
   await ctx.route(/^https:\/\/api\.the-odds-api\.com\/v4\/sports\/mma_mixed_martial_arts\/odds/,
     r => r.fulfill({ status: 200, body: ODDS, contentType: 'application/json', headers: { ...CORS, 'x-requests-remaining': '480' } }));
   const page = await ctx.newPage();
@@ -99,7 +103,7 @@ console.log('\n[1] handoff to the right origin');
   ok(got[0].origin === APP, `payload came from the app origin ${got[0].origin}`);
   ok(JSON.stringify(got[0].payload, null, 2) === built, 'handoff payload is byte for byte the built JSON');
   const gen = Date.parse(got[0].payload.batch.generated_at);
-  ok(got[0].payload.records.length === 22 && gen >= NOW && gen < NOW + 600e3,
+  ok(got[0].payload.records.length === 24 && gen >= NOW && gen < NOW + 600e3,
     `UFC 2026-09-26: ${got[0].payload.records.length} records, generated_at ${got[0].payload.batch.generated_at} is the press time`);
   const st = await status(page);
   ok(st === `Sent ${got[0].payload.records.length} records. Finish the import in The War Room.`, `status: "${st}"`);
@@ -129,11 +133,11 @@ console.log('\n[2] untick a fight and edit the label, then send');
   const { ctx, page, errors } = await openApp({ receiver: RECV + '/import/receive' });
   await page.uncheck(`#wrFights input[value="${ROLES.other_promotion.id}"]`);
   await page.fill('#wrLabel', 'UFC Fight Night: Browser');
-  ok((await page.textContent('#wrCount')).trim() === '10 fights ticked, 20 records, UFC Fight Night: Browser. Left out: 1 unticked, 1 not rated.', 'status line: ' + (await page.textContent('#wrCount')).trim());
+  ok((await page.textContent('#wrCount')).trim() === '11 fights ticked, 22 records, UFC Fight Night: Browser. Left out: 1 unticked.', 'status line: ' + (await page.textContent('#wrCount')).trim());
   const [popup] = await Promise.all([ctx.waitForEvent('page'), page.click('#wrSend')]);
   await page.waitForFunction(() => /^Sent \d+ records\./.test(document.getElementById('wrStatus').textContent), null, { timeout: 15000 });
   const got = await popup.evaluate(() => window.__got);
-  ok(got[0].payload.records.length === 20 && got[0].payload.records.every(r => r.grouping.label === 'UFC Fight Night: Browser'
+  ok(got[0].payload.records.length === 22 && got[0].payload.records.every(r => r.grouping.label === 'UFC Fight Night: Browser'
     && r.event.source_event_id !== ROLES.other_promotion.id), '20 records, edited label, unticked fight absent');
   await page.locator('#wrPanel').screenshot({ path: path.join(OUT, 'panel-1280-unticked.png') });
   ok(errors.length === 0, 'zero JS errors');
@@ -201,7 +205,7 @@ console.log('\n[6] service worker');
   const { ctx, page } = await openApp({ sw: 'allow', key: false });
   const keys = await page.evaluate(async () => { await navigator.serviceWorker.ready; for (let i = 0; i < 40; i++) {
     const k = await caches.keys(); if (k.length) return k; await new Promise(r => setTimeout(r, 100)); } return []; });
-  ok(keys.includes('corner-2.3.0'), 'cache ' + keys.join(','));
+  ok(keys.includes('corner-2.4.0'), 'cache ' + keys.join(','));
   await ctx.close();
 }
 

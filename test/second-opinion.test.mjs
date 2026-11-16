@@ -32,7 +32,8 @@ const libVs = ev(w, `(()=>{const G=new glicko2.Glicko2({tau:0.5});
   SO_GL.map=keep; return [G.predict(a,b),mine]; })()`);
 ok(Math.abs(libVs[0] - libVs[1]) < 1e-12, `matches library predict ${libVs[0]} vs ${libVs[1]}`);
 // Idle fighters grow more uncertain: same fighter, later fight date.
-const grow = ev(w, `(()=>{const f=[...SO_GL.map.keys()].find(k=>FMETA.has(k)&&M.get(k).n>=5);
+// an active fighter: since 2.4 FMETA also holds retired fighters, whose RD is already near the cap
+const grow = ev(w, `(()=>{const f=[...SO_GL.map.keys()].find(k=>FMETA.has(k)&&FMETA.get(k).last>=Date.now()-900*864e5&&M.get(k).n>=5);
   const t=new Date(+THROUGH+30*864e5), u=new Date(+THROUGH+5*365*864e5);
   return [glPair(f,f+'x',t).rdA, glPair(f,f+'x',u).rdA]; })()`);
 ok(grow[1] > grow[0] + 15, `RD grows with idle months: ${grow[0].toFixed(0)} -> ${grow[1].toFixed(0)}`);

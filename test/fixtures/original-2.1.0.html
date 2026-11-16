@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12151C">
+<title>Corner Model</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+:root{
+  --bg:#12151C; --surface:#1B202A; --surface2:#232936; --line:#2C3442;
+  --ink:#E9ECF2; --mute:#868FA0; --dim:#5A6375;
+  --red:#D64541;     /* red corner, always fighter on the left */
+  --blue:#4A86C8;    /* blue corner, always fighter on the right */
+  --warn:#E0A43C;    /* uncertainty */
+  --r:10px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px; line-height:1.5;
+  font-variant-numeric:tabular-nums; font-feature-settings:"tnum" 1;
+  padding:0 0 max(28px,env(safe-area-inset-bottom));
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:720px;margin:0 auto;padding:0 14px}
+header{padding:20px 0 12px;border-bottom:1px solid var(--line);margin-bottom:14px}
+h1{font-size:21px;font-weight:650;letter-spacing:-.015em;margin:0 0 3px}
+.sub{font-size:13px;color:var(--mute);margin:0}
+
+.tabs{display:flex;gap:6px;margin:0 0 14px}
+button,select,input{
+  font:inherit;font-size:14px;color:var(--ink);background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r);
+  min-height:44px;padding:0 14px;cursor:pointer;
+  transition:background .14s ease,border-color .14s ease;
+}
+input{cursor:text;padding:0 12px}
+button:hover,select:hover{background:var(--surface2)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+button.on{border-color:var(--warn);color:var(--warn)}
+.tabs button{flex:1;padding:0 6px}
+
+.corners{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.corner label{display:block;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--dim);margin-bottom:5px}
+.corner.red label{color:var(--red)} .corner.blue label{color:var(--blue)}
+.combo{position:relative}
+.combo input{width:100%;padding-right:38px}
+.combo .clear{position:absolute;right:4px;top:4px;min-height:36px;width:32px;padding:0;
+  background:none;border:none;color:var(--dim);font-size:19px;line-height:1}
+.combo .list{display:none;position:absolute;z-index:20;left:0;right:0;top:48px;
+  max-height:266px;overflow-y:auto;background:var(--surface2);
+  border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:0 12px 28px rgba(0,0,0,.5)}
+.combo .list.open{display:block}
+.combo .list [data-i]{padding:10px 12px;cursor:pointer;font-size:14.5px;border-bottom:1px solid var(--line)}
+.combo .list [data-i]:last-child{border-bottom:none}
+.combo .list [data-i].hi,.combo .list [data-i]:hover{background:var(--surface)}
+.combo .list small{display:block;font-size:11.5px;color:var(--dim)}
+.combo .list .none{padding:14px 12px;color:var(--mute);font-size:14px}
+.opts{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.opts select{flex:1;min-width:150px}
+.opts input[type=date]{width:auto;flex:0 0 auto}
+
+.verdict{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 15px}
+.names{display:flex;justify-content:space-between;font-size:14.5px;font-weight:600;gap:12px}
+.names .l{color:var(--red)} .names .r{color:var(--blue);text-align:right}
+.probbar{height:12px;border-radius:6px;background:var(--blue);margin:11px 0 7px;overflow:hidden}
+.probbar span{display:block;height:100%;background:var(--red)}
+.probnums{display:flex;justify-content:space-between;font-size:22px;font-weight:680;letter-spacing:-.02em}
+.probnums .l{color:var(--red)} .probnums .r{color:var(--blue)}
+.flag{margin-top:12px;padding:10px 12px;background:var(--surface2);border-left:3px solid var(--warn);
+  border-radius:6px;font-size:12.5px;color:var(--mute);line-height:1.6}
+.flag b{color:var(--warn)}
+.drivers{margin-top:16px}
+.drivers h3{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--dim);
+  margin:0 0 9px;font-weight:600}
+.drow{display:grid;grid-template-columns:104px 1fr 56px;gap:10px;align-items:center;
+  margin-bottom:7px;font-size:12.5px}
+.dtrack{position:relative;height:8px;background:var(--bg);border-radius:4px}
+.dtrack:after{content:"";position:absolute;left:50%;top:-2px;width:1px;height:12px;background:var(--line)}
+.dfill{position:absolute;top:0;height:100%;border-radius:4px}
+.dval{text-align:right;font-weight:600}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:15px}
+.stat{background:var(--surface2);border-radius:8px;padding:10px 11px}
+.stat b{display:block;font-size:17px;font-weight:650;letter-spacing:-.02em}
+.stat span{font-size:11px;color:var(--dim)}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:9px 6px;text-align:right;border-bottom:1px solid var(--line)}
+th{font-size:12px;font-weight:500;color:var(--dim);position:sticky;top:0;background:var(--bg)}
+th:first-child,td:first-child{text-align:left;font-weight:600}
+tbody tr:hover{background:var(--surface)}
+.pos{color:var(--red)} .neg{color:var(--blue)}
+.note{color:var(--mute);font-size:13.5px;padding:18px 2px;line-height:1.65}
+.err{color:var(--warn)}
+.skel{height:150px;border-radius:var(--r);background:var(--surface);
+  background-image:linear-gradient(90deg,var(--surface) 0%,var(--surface2) 50%,var(--surface) 100%);
+  background-size:200% 100%;animation:sh 1.3s ease-in-out infinite}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.cardrow{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;margin-bottom:9px}
+.cr-top{display:flex;justify-content:space-between;gap:10px;font-size:14px;font-weight:600;margin-bottom:8px}
+.cr-names .l{color:var(--red)} .cr-names .r{color:var(--blue)}
+.cr-when{color:var(--dim);font-weight:500;font-size:12.5px;white-space:nowrap}
+.cr-grid{display:grid;grid-template-columns:1fr auto auto;gap:4px 16px;font-size:13px;align-items:baseline}
+.cr-grid span{color:var(--mute)} .cr-grid b{text-align:right;font-weight:600}
+.cr-grid b.l{color:var(--red)} .cr-grid b.r{color:var(--blue)}
+.cr-foot{margin-top:8px;font-size:12.5px;color:var(--mute)}
+.pill{display:inline-block;padding:1px 8px;border-radius:9px;border:1px solid var(--line);font-size:11.5px;color:var(--ink);margin-left:4px}
+.pill.warn{border-color:var(--warn);color:var(--warn)}
+.pe-books{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--mute);margin:-4px 0 4px}
+.pe-books label{display:flex;align-items:center;gap:6px;min-height:32px;cursor:pointer}
+.pe-books input{min-height:0;width:18px;height:18px;padding:0;accent-color:var(--warn)}
+footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--dim);line-height:1.7}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:420px){
+  .probnums{font-size:19px}
+  .grid3{grid-template-columns:repeat(2,1fr)}
+  .drow{grid-template-columns:92px 1fr 50px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Corner Model</h1>
+  <p class="sub" id="sub">Loading fight history</p>
+</header>
+
+<div class="tabs">
+  <button id="tabMatch" class="on">Matchup</button>
+  <button id="tabRank">Rankings</button>
+  <button id="tabLog">Recent</button>
+  <button id="tabCard">Card</button>
+</div>
+
+<section id="matchView">
+  <div id="matchBody"><div class="skel"></div></div>
+</section>
+
+<section id="rankView" style="display:none">
+  <div class="opts">
+    <select id="rankDiv" aria-label="Division"></select>
+    <button id="refresh2">Refresh</button>
+  </div>
+  <div id="rank"></div>
+</section>
+
+<section id="logView" style="display:none">
+  <div id="log"></div>
+</section>
+
+<section id="cardView" style="display:none">
+  <div id="card"></div>
+</section>
+
+<footer>
+  <div id="foot1"></div>
+  <div id="foot2" style="margin-top:6px"></div>
+  <div style="margin-top:8px">This forecasts fights. It is not a betting tool. The last time this
+  model was tested against closing moneylines it added no significant information beyond the
+  price, so the Card tab shows the market next to Corner only to test that again, fight by
+  fight, and says plainly what the record shows. A gap is something to research, not a bet.</div>
+</footer>
+
+</div>
+
+<script>
+/* ============================================================
+   CORNER MODEL
+   v2.0.0
+
+   What changed in 2.0, and the evidence for each, so future me does not
+   quietly undo any of it.
+
+   1. The model now reads the fight statistics, not just the result.
+      Every prediction before this knew only who won. ufc_fight_stats.csv
+      sits in the same repo as the results file and carries per round
+      knockdowns, significant strikes landed and attempted, takedowns,
+      submission attempts and control time. Joined on event plus bout it
+      matches 100% of decided fights.
+
+      Twelve career rate features, all walk forward and shrunk toward the
+      running league mean by exposure, were fitted on every fight before
+      2022 and tested on everything after:
+
+                          held out 2022+        2023+        full sample
+        as shipped        AUC 0.6583          0.6580        0.6327
+        with the stats    AUC 0.6804          0.6826        0.6592
+        log loss           .6598 -> .6419
+
+      Accuracy on fights since 2023 goes from 61.38% to 63.20%. That is the
+      whole reason this version exists. Do not strip the feature layer to
+      make the file smaller.
+
+   2. The old under confidence is gone, so the separate recalibration is NOT
+      applied. Without the features a single scale of 1.32 was needed and
+      earned real log loss. With them the fitted scale is 1.00, and applying
+      1.32 on top would now overshoot. The model reaches 89% confidence and
+      puts 14.6% of fights above 70%, against a 79.9% ceiling and 2.3% before.
+
+   3. Rankings now rank by who the model would actually favour, not by the
+      raw rating. The rating is learned as a residual AFTER age and reach are
+      already in the logit, so sorting by it put Sterling 3rd where the model
+      itself had him 10th: only 7 of the top 12 agreed. Certainty now comes
+      from the same staleness inflation used at prediction time. It used to
+      read the stored value, which showed 84% for a fighter idle 897 days
+      whose honest number was 57%, directly contradicting its own caption.
+
+   4. A missing date of birth no longer buys an advantage. agePen returned 0
+      for a null DOB, so a fighter with no birthday on file could never be
+      docked for age while his opponent could, in 219 of 8,730 fights, in the
+      single most predictive term in the model. The whole term is now zero
+      unless both ages are known.
+
+   5. The division is read off the two fighters instead of defaulting to
+      whichever division had the most recent fights. Leaving that default
+      wrong applied a phantom weight class change penalty to both men and
+      moved the answer by about a point of probability, more than a point in
+      43% of cross division matchups.
+
+   6. Nothing on the read path mutates the model. detail() called touch(),
+      which grew the rating map by two entries every time it was handed a
+      name it had not seen.
+   ============================================================ */
+
+const MODEL_VERSION='2.1.0';
+const FIT_DATE='2026-09-19';
+
+/* Rating parameters from the offline reference, unchanged. */
+const P = {"R":1.2279,"P0":1.296,"q_game":0.0954,"q_layoff":0.3974,"q_movediv":0.7521,
+  "P_max":2.8167,"defl":1.0578,"lr":0.9877,"b_reach":0.0203,"b_age":0.0894,
+  "age_peak":28.4392,"b_lay":0.1735,"b_south":0.0496};
+
+/* Feature coefficients, fitted by coordinate descent on walk forward log loss
+   over every fight before 2022 and never shown the test window.
+
+   Read these as a block, not one at a time. The grappling and finishing terms
+   are collinear with each other, so a couple carry a sign that looks wrong on
+   its own while the group they belong to is firmly positive. That is exactly
+   why the driver display groups them. */
+const FB={SLpM:0.222252, SApM:-0.310144, strAcc:0.723504, strDef:2.256819,
+  TD15:0.260305, TDacc:-1.882751, TDdef:2.010545, ctrl:-0.580924,
+  KD15:-0.084602, sub15:-0.100638, finW:0.507546, finL:-0.769900};
+const FKEY=['SLpM','SApM','strAcc','strDef','TD15','TDacc','TDdef','ctrl','KD15','sub15','finW','finL'];
+const FGROUP={striking:['SLpM','SApM','strAcc','strDef'],
+  grappling:['TD15','TDacc','TDdef','ctrl'],
+  finishing:['KD15','sub15','finW','finL']};
+/* shrinkage: a debutant's single fight must not become a career rate */
+const K_MIN=15, K_ATT=60, K_N=3;
+const SCALE=1.00;
+
+const SIG=z=>1/(1+Math.exp(-Math.max(-30,Math.min(30,z))));
+
+/* ============================================================
+   CSV
+   ============================================================ */
+function parseCSV(text){
+  /* Fast path. The four files total about 10 MB and the character by
+     character parser was the whole load cost: 487 ms on the stats file alone
+     against 88 ms this way. A line is only split naively when it holds no
+     quote, and the whole file falls back to the slow parser if any line has
+     an unbalanced quote, which is the only way a field could span a newline. */
+  const lines=text.split('\n');
+  let safe=true;
+  for(let i=0;i<lines.length&&safe;i++){
+    let q=0;const L=lines[i];
+    for(let j=0;j<L.length;j++)if(L.charCodeAt(j)===34)q++;
+    if(q&1)safe=false;
+  }
+  let rows;
+  if(safe){
+    rows=[];
+    for(let i=0;i<lines.length;i++){
+      let L=lines[i];
+      if(L.charCodeAt(L.length-1)===13)L=L.slice(0,-1);
+      if(!L.length)continue;
+      rows.push(L.indexOf('"')===-1?L.split(','):slowLine(L));
+    }
+  } else rows=slowAll(text);
+  const head=rows.shift().map(h=>h.trim()),ix={};head.forEach((h,i)=>ix[h]=i);
+  return{rows:rows.filter(r=>r.length>=head.length-1),ix};
+}
+function slowLine(L){const row=[];let f='',q=false;
+  for(let i=0;i<L.length;i++){const c=L[i];
+    if(q){if(c==='"'){if(L[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+    else if(c==='"')q=true;
+    else if(c===','){row.push(f);f='';}
+    else f+=c;}
+  row.push(f);return row;}
+function slowAll(text){const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+    else if(c==='"')q=true;
+    else if(c===','){row.push(f);f='';}
+    else if(c==='\n'){row.push(f);rows.push(row);row=[];f='';}
+    else if(c!=='\r')f+=c;}
+  if(f.length||row.length){row.push(f);rows.push(row);}
+  return rows;}
+
+/* Upstream is a third-party scrape. If a column is ever renamed the parser
+   would quietly yield nulls and the app would show confident nonsense, so
+   required headers are checked explicitly and failure is loud. */
+function needCols(ix,want,file){
+  const miss=want.filter(c=>ix[c]===undefined);
+  if(miss.length) throw new Error(
+    `${file} is missing expected column(s): ${miss.join(', ')}. `+
+    `The upstream data format changed.`);
+}
+
+const MONTHS={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function pdate(s){
+  if(!s)return null;
+  const m=s.trim().match(/^([A-Za-z]+)\s+(\d+),\s*(\d{4})$/);
+  if(!m)return null;
+  const mo=MONTHS[m[1].slice(0,3)];
+  return mo===undefined?null:new Date(Date.UTC(+m[3],mo,+m[2]));
+}
+const inchesR=s=>{const m=(s||'').match(/^(\d+)/);return m&&s!=='--'?+m[1]:NaN;};
+const ofN=s=>{const m=(s||'').match(/(\d+)\s+of\s+(\d+)/);return m?[+m[1],+m[2]]:[0,0];};
+const ctrlS=s=>{const m=(s||'').match(/^(\d+):(\d+)$/);return m?(+m[1])*60+(+m[2]):0;};
+const mmss=s=>{const m=(s||'').match(/^(\d+):(\d+)$/);return m?(+m[1])+(+m[2])/60:null;};
+const roundLens=tf=>{const m=(tf||'').match(/\(([\d\- ]+)\)/);
+  return m?m[1].split('-').map(x=>+x.trim()).filter(x=>x>0):[5,5,5,5,5];};
+const isFinish=m=>/KO\/TKO|Submission|Doctor/i.test(m||'');
+
+/* ============================================================
+   MODEL
+   One record per fighter: rating, uncertainty, count, last seen, last
+   division, and the career statistical totals. Reads never mutate.
+   ============================================================ */
+const BLANK=Object.freeze({r:0,P:P.P0,n:0,last:null,div:null,
+  min:0,sl:0,sa:0,osl:0,osa:0,tl:0,ta:0,otl:0,ota:0,ctrl:0,kd:0,sub:0,
+  nf:0,winFin:0,lossFin:0});
+
+class UFCModel{
+  constructor(p=P){Object.assign(this,p);
+    this.f=new Map();
+    /* running league means, so every rate is shrunk toward the sport as it
+       was at the time, not as it is now */
+    this.L={slpm:3.5,acc:0.45,td15:1.5,tdacc:0.4,ctrl:0.2,kd15:0.5,sub15:0.5,finw:0.27,finl:0.27};
+    this.T={min:0,sl:0,sa:0,tl:0,ta:0,ctrl:0,kd:0,sub:0,n:0,fw:0,fl:0};}
+  get(f){return this.f.get(f)||BLANK;}
+  own(f){let a=this.f.get(f);
+    if(!a){a=Object.assign({},BLANK);this.f.set(f,a);}return a;}
+
+  stale(f,date,dv){const a=this.get(f);let p=a.P;
+    if(a.last){const y=(date-a.last)/(365.25*864e5);p+=this.q_layoff*Math.max(0,y-0.5);}
+    if(a.div&&dv&&dv!==a.div)p+=this.q_movediv;
+    return Math.min(p,this.P_max);}
+  agePen(a){return (a==null||!isFinite(a))?0:-this.b_age*Math.max(0,a-this.age_peak);}
+  layPen(f,date){const a=this.get(f);if(!a.last)return 0;
+    const y=(date-a.last)/(365.25*864e5);return -this.b_lay*Math.max(0,y-0.75);}
+
+  /* career rates, shrunk toward the running league mean by exposure */
+  rates(a){const L=this.L;
+    const rate=(x,mu)=>(x+mu*K_MIN)/(a.min+K_MIN);
+    const ratio=(x,y,mu)=>(x+mu*K_ATT)/(y+K_ATT);
+    const share=(c,mu)=>(c+mu*K_N)/(a.nf+K_N);
+    return{SLpM:rate(a.sl,L.slpm), SApM:rate(a.osl,L.slpm),
+      strAcc:ratio(a.sl,a.sa,L.acc), strDef:1-ratio(a.osl,a.osa,L.acc),
+      TD15:15*rate(a.tl,L.td15/15), TDacc:ratio(a.tl,a.ta,L.tdacc),
+      TDdef:1-ratio(a.otl,a.ota,L.tdacc),
+      ctrl:(a.ctrl/60+L.ctrl*K_MIN)/(a.min+K_MIN),
+      KD15:15*rate(a.kd,L.kd15/15), sub15:15*rate(a.sub,L.sub15/15),
+      finW:share(a.winFin,L.finw), finL:share(a.lossFin,L.finl)};}
+
+  detail(f1,f2,date,dv,at){
+    const A=this.get(f1),B=this.get(f2);
+    const P1=this.stale(f1,date,dv),P2=this.stale(f2,date,dv);
+    const c={skill:A.r-B.r,reach:0,age:0,layoff:0,stance:0,
+      striking:0,grappling:0,finishing:0};
+    const a=at(f1),b=at(f2);
+    if(isFinite(a.reach)&&isFinite(b.reach))c.reach=this.b_reach*(a.reach-b.reach);
+    const age1=a.dob?(date-a.dob)/(365.25*864e5):null, age2=b.dob?(date-b.dob)/(365.25*864e5):null;
+    /* both ages or neither. A missing birthday used to mean a free pass on the
+       age penalty while the opponent still paid it. */
+    c.age=(age1!=null&&age2!=null)?this.agePen(age1)-this.agePen(age2):0;
+    c.layoff=this.layPen(f1,date)-this.layPen(f2,date);
+    if(a.stance==='Southpaw'&&b.stance==='Orthodox')c.stance=this.b_south;
+    else if(b.stance==='Southpaw'&&a.stance==='Orthodox')c.stance=-this.b_south;
+
+    const rA=this.rates(A),rB=this.rates(B);
+    const parts={};
+    for(const k of FKEY)parts[k]=FB[k]*(rA[k]-rB[k]);
+    for(const g in FGROUP)c[g]=FGROUP[g].reduce((s,k)=>s+parts[k],0);
+
+    let z=0;for(const k in c)z+=c[k];
+    const defl=Math.sqrt(1+this.defl*(P1+P2));
+    return{p:SIG(SCALE*z/defl),pRaw:SIG(SCALE*z),z,defl,c,parts,P1,P2,
+      n1:A.n,n2:B.n,age1,age2,rA,rB};
+  }
+
+  update(g,d){
+    for(const[f,Pu,s]of[[g.f1,d.P1,1],[g.f2,d.P2,-1]]){
+      const a=this.own(f);
+      const K=Pu/(Pu+this.R);
+      a.r=a.r+this.lr*K*s*(g.y-d.p);
+      a.P=(1-K)*Pu+this.q_game;
+      a.n=a.n+1; a.last=g.date; a.div=g.div;}
+    if(g.s1&&g.s2&&g.dur>0)this.absorb(g);
+  }
+  absorb(g){
+    const push=(a,me,op,won)=>{
+      a.min+=g.dur;a.sl+=me.sl;a.sa+=me.sa;a.osl+=op.sl;a.osa+=op.sa;
+      a.tl+=me.tl;a.ta+=me.ta;a.otl+=op.tl;a.ota+=op.ta;
+      a.ctrl+=me.ctrl;a.kd+=me.kd;a.sub+=me.sub;a.nf++;
+      if(isFinish(g.method)){won?a.winFin++:a.lossFin++;}};
+    push(this.own(g.f1),g.s1,g.s2,g.y===1);
+    push(this.own(g.f2),g.s2,g.s1,g.y===0);
+    const T=this.T;
+    T.min+=2*g.dur;T.sl+=g.s1.sl+g.s2.sl;T.sa+=g.s1.sa+g.s2.sa;
+    T.tl+=g.s1.tl+g.s2.tl;T.ta+=g.s1.ta+g.s2.ta;
+    T.ctrl+=(g.s1.ctrl+g.s2.ctrl)/60;T.kd+=g.s1.kd+g.s2.kd;T.sub+=g.s1.sub+g.s2.sub;
+    T.n+=2;if(isFinish(g.method)){T.fw++;T.fl++;}
+    if(T.min>200){const L=this.L;
+      L.slpm=T.sl/T.min;L.acc=T.sl/Math.max(1,T.sa);L.td15=15*T.tl/T.min;
+      L.tdacc=T.tl/Math.max(1,T.ta);L.ctrl=T.ctrl/T.min;L.kd15=15*T.kd/T.min;
+      L.sub15=15*T.sub/T.min;L.finw=T.fw/T.n;L.finl=T.fl/T.n;}
+  }
+  snapshot(){return{f:[...this.f],L:this.L,T:this.T};}
+  static from(s){const m=new UFCModel();m.f=new Map(s.f);m.L=s.L;m.T=s.T;
+    /* IndexedDB preserves a Date through structured clone, the localStorage
+       fallback does not. Coerce on the way in or every layoff term is NaN. */
+    for(const[k,a]of m.f)if(a.last!=null&&!(a.last instanceof Date))a.last=new Date(a.last);
+    return m;}
+}
+
+/* ============================================================
+   DATA
+   ============================================================ */
+const BASE='https://raw.githubusercontent.com/Greco1899/scrape_ufc_stats/main/';
+const KEY='corner.raw.v3', FITKEY='corner.fit.'+MODEL_VERSION;
+let M=null,ATT=new Map(),LOG=[],DIVS=[],VIEW='match',NAMES=[],FMETA=new Map();
+let THROUGH=null,FIT_MS=0,FIT_CACHED=false,MEDREACH=71;
+const attOf=f=>ATT.get(f)||{reach:NaN,stance:null,dob:null};
+
+const HAS_IDB=typeof indexedDB!=='undefined'&&indexedDB!==null;
+function idb(){return new Promise((res,rej)=>{
+  const r=indexedDB.open('corner',1);
+  r.onupgradeneeded=()=>r.result.createObjectStore('kv');
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);});}
+async function cacheGet(k){
+  if(HAS_IDB){try{
+    const db=await idb();
+    return await new Promise((res,rej)=>{
+      const q=db.transaction('kv').objectStore('kv').get(k);
+      q.onsuccess=()=>res(q.result||null); q.onerror=()=>rej(q.error);});
+  }catch(e){}}
+  try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}
+}
+async function cacheSet(k,v){
+  if(HAS_IDB){try{
+    const db=await idb();
+    await new Promise((res,rej)=>{
+      const q=db.transaction('kv','readwrite').objectStore('kv').put(v,k);
+      q.onsuccess=()=>res(); q.onerror=()=>rej(q.error);});
+    return true;
+  }catch(e){}}
+  try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){return false;}
+}
+
+async function pull(force){
+  let c=null; try{c=await cacheGet(KEY);}catch(e){}
+  if(c&&!force&&Date.now()-c.at<6*3600*1000)return{...c,cached:true};
+  try{
+    const [a,b,e,s]=await Promise.all([
+      fetch(BASE+'ufc_fight_results.csv',{cache:'no-store'}).then(r=>r.text()),
+      fetch(BASE+'ufc_fighter_tott.csv',{cache:'no-store'}).then(r=>r.text()),
+      fetch(BASE+'ufc_event_details.csv',{cache:'no-store'}).then(r=>r.text()),
+      fetch(BASE+'ufc_fight_stats.csv',{cache:'no-store'}).then(r=>r.text())]);
+    const o={at:Date.now(),a,b,e,s};
+    await cacheSet(KEY,o);
+    return{...o,cached:false};
+  }catch(err){ if(c)return{...c,cached:true,stale:true}; throw err; }
+}
+
+function build(d){
+  const ev=parseCSV(d.e); needCols(ev.ix,['EVENT','DATE'],'ufc_event_details.csv');
+  const edate=new Map();
+  for(const r of ev.rows) edate.set((r[ev.ix.EVENT]||'').trim(), pdate(r[ev.ix.DATE]));
+
+  const tt=parseCSV(d.b); needCols(tt.ix,['FIGHTER','REACH','STANCE','DOB'],'ufc_fighter_tott.csv');
+  ATT=new Map();const reaches=[];
+  for(const r of tt.rows){
+    const nm=(r[tt.ix.FIGHTER]||'').trim(); if(!nm||ATT.has(nm))continue;
+    const reach=inchesR(r[tt.ix.REACH]);
+    if(isFinite(reach))reaches.push(reach);
+    ATT.set(nm,{reach,stance:(r[tt.ix.STANCE]||'').trim()||null,dob:pdate(r[tt.ix.DOB])});
+  }
+  reaches.sort((a,b)=>a-b);
+  MEDREACH=reaches.length?reaches[Math.floor(reaches.length/2)]:71;
+
+  /* per round statistics, summed to one block per fighter per fight */
+  const st=parseCSV(d.s);
+  needCols(st.ix,['EVENT','BOUT','ROUND','FIGHTER','KD','SIG.STR.','TD','SUB.ATT','CTRL'],
+    'ufc_fight_stats.csv');
+  const SX=st.ix, agg=new Map();
+  for(const r of st.rows){
+    const k=(r[SX.EVENT]||'').trim()+'||'+(r[SX.BOUT]||'').trim();
+    const f=(r[SX.FIGHTER]||'').trim(); if(!f)continue;
+    let e=agg.get(k); if(!e){e={};agg.set(k,e);}
+    let a=e[f]; if(!a)a=e[f]={kd:0,sl:0,sa:0,tl:0,ta:0,sub:0,ctrl:0};
+    const[sl,sa]=ofN(r[SX['SIG.STR.']]); const[tl,ta]=ofN(r[SX.TD]);
+    a.kd+=+(r[SX.KD]||0);a.sl+=sl;a.sa+=sa;a.tl+=tl;a.ta+=ta;
+    a.sub+=+(r[SX['SUB.ATT']]||0);a.ctrl+=ctrlS(r[SX.CTRL]);
+  }
+
+  const fr=parseCSV(d.a);
+  needCols(fr.ix,['EVENT','BOUT','OUTCOME','WEIGHTCLASS','METHOD','ROUND','TIME','TIME FORMAT'],
+    'ufc_fight_results.csv');
+  const FX=fr.ix, out=[];
+  for(const r of fr.rows){
+    const oc=(r[FX.OUTCOME]||'').trim();
+    if(oc!=='W/L'&&oc!=='L/W')continue;
+    const evName=(r[FX.EVENT]||'').trim();
+    const date=edate.get(evName); if(!date)continue;
+    const bout=(r[FX.BOUT]||'').trim();
+    const parts=bout.split(' vs. '); if(parts.length<2)continue;
+    const A=parts[0].trim(), B=parts.slice(1).join(' vs. ').trim();
+    if(!A||!B)continue;
+    /* CANONICAL ALPHABETICAL ORIENTATION.
+       In the raw file the first-listed fighter wins 64% of the time, which is a
+       writing convention, not information. The model has no intercept to absorb
+       it, so reordering by name is what keeps it out of the ratings. */
+    const swap=A.toLowerCase()>B.toLowerCase();
+    const aWon=oc==='W/L'?1:0;
+    const wc=(r[FX.WEIGHTCLASS]||'').trim();
+    const lens=roundLens(r[FX['TIME FORMAT']]);
+    const fin=+(r[FX.ROUND]||0), tIn=mmss(r[FX.TIME]);
+    let dur=0; for(let i=0;i<fin-1;i++)dur+=lens[i]!==undefined?lens[i]:5;
+    dur+=(tIn!==null?tIn:(lens[fin-1]!==undefined?lens[fin-1]:5));
+    if(!(dur>0))dur=15;
+    const s=agg.get(evName+'||'+bout);
+    const sa=s?s[A]:null, sb=s?s[B]:null;
+    out.push({f1:swap?B:A,f2:swap?A:B,date,y:swap?1-aWon:aWon,
+      div:wc.replace(' Bout','').replace('UFC ','').replace(' Title','').trim(),
+      method:(r[FX.METHOD]||'').trim(),dur,
+      s1:swap?sb:sa, s2:swap?sa:sb});
+  }
+  out.sort((x,y)=>x.date-y.date);
+  return out;
+}
+
+function fit(fights){
+  const m=new UFCModel(); const log=[];
+  const cutoff=fights.length?new Date(fights[fights.length-1].date-400*864e5):null;
+  for(const g of fights){
+    const d=m.detail(g.f1,g.f2,g.date,g.div,attOf);
+    if(cutoff&&g.date>=cutoff&&d.n1>=1&&d.n2>=1)
+      log.push({f1:g.f1,f2:g.f2,date:+g.date,div:g.div,y:g.y,p:d.p});
+    m.update(g,d);
+  }
+  return{m,log};
+}
+
+/* ============================================================
+   PRICE ENGINE v1  (shared: Gridiron NFL, Gridiron CFB, Corner)
+
+   The one edge these apps can count on is price. A model's opinion is only
+   worth something at the price you actually get, and the price you get is
+   the best of your books, not a closing number from a schedule file. This
+   pulls every US book's moneyline, spread and total for a sport in ONE call
+   from The Odds API (cost: 1 credit per market, so 3 per refresh), keeps it
+   in IndexedDB, and answers two questions for each side of each game:
+     1. what is the best price at the books you can actually bet, and
+     2. what is the market's vig free probability, as the median across
+        every book that posts both sides at the most common line.
+
+   Each app supplies three things: a namespace for its settings, its
+   cacheGet/cacheSet, and its own mapping from an event to a game.
+   This block is identical in all three apps. Change it in one, copy it to
+   all, and bump PE_VERSION.
+   ============================================================ */
+const PE_VERSION = 1.1;   // 1.1 adds peFetch's optional markets argument; v1 copies behave identically without it
+const PE_API = 'https://api.the-odds-api.com/v4';
+const PE_BOOKS = [['draftkings','DraftKings','DK'],['fanduel','FanDuel','FD'],['betmgm','BetMGM','MGM'],
+  ['williamhill_us','Caesars','CZR'],['fanatics','Fanatics','FAN'],['betrivers','BetRivers','BR'],
+  ['hardrockbet','Hard Rock Bet','HR'],['espnbet','ESPN BET','ESPN'],['ballybet','Bally Bet','BAL']];
+const PE_DEFAULT_MINE = ['draftkings','fanduel','betmgm','williamhill_us','fanatics'];
+const PE_TTL = 60*60*1000;   // auto refresh at most hourly; the button refreshes on demand
+const peShort = key => { const b = PE_BOOKS.find(x => x[0] === key); return b ? b[2] : String(key||'').slice(0,4).toUpperCase(); };
+const peMedian = a => { if(!a.length) return null; const s=[...a].sort((x,y)=>x-y), m=s.length>>1; return s.length%2?s[m]:(s[m-1]+s[m])/2; };
+const peAmToProb = a => a>0 ? 100/(a+100) : -a/(-a+100);
+const peAmToDec  = a => a>0 ? 1+a/100 : 1+100/-a;
+
+function peLoadSettings(ns){
+  try{ const s = JSON.parse(localStorage.getItem(ns+'.odds')||'null');
+    if(s && Array.isArray(s.mine)) return {key:s.key||'', mine:s.mine}; }catch(e){}
+  return {key:'', mine:PE_DEFAULT_MINE.slice()};
+}
+function peSaveSettings(ns, s){ try{ localStorage.setItem(ns+'.odds', JSON.stringify(s)); }catch(e){} }
+
+/* One call for the whole sport. Returns {at, events, remaining, stale?, error?}.
+   Never throws: a failed refresh falls back to the last good pull. */
+async function peFetch(sport, settings, store, force, markets){
+  const ck = 'pe.'+sport;
+  let cached = null; try{ cached = await store.get(ck); }catch(e){}
+  if(!settings.key) return cached ? {...cached, stale:true, error:'No Odds API key saved'} : null;
+  if(cached && !force && Date.now()-cached.at < PE_TTL) return cached;
+  try{
+    const url = `${PE_API}/sports/${sport}/odds?apiKey=${encodeURIComponent(settings.key.trim())}`
+      + `&regions=us&markets=${markets||'h2h,spreads,totals'}&oddsFormat=american`;
+    const r = await fetch(url);
+    if(r.status===401) throw new Error('Odds API key rejected');
+    if(r.status===429) throw new Error('Odds API monthly credits used up');
+    if(!r.ok) throw new Error('Odds API error '+r.status);
+    const events = await r.json();
+    const rem = r.headers && r.headers.get ? r.headers.get('x-requests-remaining') : null;
+    const out = {at:Date.now(), events:Array.isArray(events)?events:[], remaining:rem!=null?+rem:null, sport};
+    try{ await store.set(ck, out); }catch(e){}
+    return out;
+  }catch(e){
+    return cached ? {...cached, stale:true, error:e.message} : {at:null, events:[], error:e.message, sport};
+  }
+}
+
+/* Flatten one event into per-book markets. Names are the API's team or
+   fighter names; totals use 'Over'/'Under'. */
+function peBooksOf(ev, mine){
+  return (ev.bookmakers||[]).map(bk => {
+    const o = {key:bk.key, title:bk.title, mine:mine.includes(bk.key), updated:Date.parse(bk.last_update)||null,
+               h2h:{}, spreads:{}, totals:{}};
+    for(const mk of bk.markets||[]){
+      for(const oc of mk.outcomes||[]){
+        if(mk.key==='h2h') o.h2h[oc.name] = oc.price;
+        else if(mk.key==='spreads') o.spreads[oc.name] = {price:oc.price, point:oc.point};
+        else if(mk.key==='totals') o.totals[oc.name] = {price:oc.price, point:oc.point};
+      }
+    }
+    return o;
+  });
+}
+
+/* Vig free probability of side A, as the median across books that post both
+   sides at the most common line. Returns {line, pA, n} or null.
+   kind 'h2h' ignores lines. For 'spreads' the line is side A's point. */
+function peConsensus(books, kind, a, b){
+  const rows = [];
+  for(const bk of books){
+    const A = bk[kind][a], B = bk[kind][b];
+    if(kind==='h2h'){ if(A!=null && B!=null) rows.push({line:0, A, B}); }
+    else if(A && B && A.price!=null && B.price!=null) rows.push({line:A.point, A:A.price, B:B.price});
+  }
+  if(!rows.length) return null;
+  const cnt = {}; rows.forEach(r => cnt[r.line] = (cnt[r.line]||0)+1);
+  const line = +Object.keys(cnt).sort((x,y) => cnt[y]-cnt[x] || Math.abs(x)-Math.abs(y))[0];
+  const ps = rows.filter(r => r.line===line).map(r => { const pa=peAmToProb(r.A), pb=peAmToProb(r.B); return pa/(pa+pb); });
+  return {line, pA:peMedian(ps), n:ps.length};
+}
+
+/* ============================================================
+   CARD VIEW AND DISAGREEMENT LOG  (2.1)
+
+   Corner was tested against closing moneylines and added no significant
+   information beyond the price. That test used closing prices. The fairer
+   test is whether Corner's disagreement with the OPENING price predicts
+   where the line CLOSES: if the market later moves toward Corner, Corner saw
+   something first. This view shows the upcoming card with Corner's number
+   next to the market's, and every price pull records both, so the question
+   answers itself over a season of cards. Nothing here is a bet recommendation.
+   ============================================================ */
+const PE_NS='corner', PE_SPORT='mma_mixed_martial_arts';
+let PE_S=peLoadSettings(PE_NS), PE_DATA=null, SNAPS={};
+const PE_STORE={get:k=>cacheGet(k), set:(k,v)=>cacheSet(k,v)};
+const SNAP_KEY='corner.snaps.v1';
+const fNorm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+  .replace(/['\u2019.]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+let F_INDEX=null;
+/* Exact name first; then last name plus first initial when that is unique. */
+function fighterFor(apiName){
+  if(!F_INDEX){ F_INDEX={exact:new Map(), byLast:new Map()};
+    for(const k of M.f.keys()){ if(k===REF) continue; const n=fNorm(k); F_INDEX.exact.set(n,k);
+      const parts=n.split(' '); const key=parts[parts.length-1]+'|'+(parts[0]||'')[0];
+      F_INDEX.byLast.set(key,(F_INDEX.byLast.get(key)||[]).concat(k)); } }
+  const n=fNorm(apiName); if(F_INDEX.exact.has(n)) return F_INDEX.exact.get(n);
+  const parts=n.split(' '); const c=F_INDEX.byLast.get(parts[parts.length-1]+'|'+(parts[0]||'')[0])||[];
+  return c.length===1?c[0]:null;
+}
+function divFor(a,b){ const A=M.get(a), B=M.get(b);
+  if(A.last&&B.last) return (A.last>=B.last?A.div:B.div)||A.div||B.div; return A.div||B.div||null; }
+function cardRows(){
+  if(!PE_DATA||!PE_DATA.events) return [];
+  return PE_DATA.events.filter(ev=>Date.parse(ev.commence_time)>Date.now()-6*3600e3)
+    .sort((x,y)=>Date.parse(x.commence_time)-Date.parse(y.commence_time)).map(ev=>{
+    const books=peBooksOf(ev,PE_S.mine), mine=books.filter(b=>b.mine);
+    const c=peConsensus(books,'h2h',ev.home_team,ev.away_team);
+    const best=nm=>{let t=null;for(const bk of mine){const v=bk.h2h[nm];if(v!=null&&(!t||peAmToDec(v)>peAmToDec(t.v)))t={v,k:bk.key};}return t;};
+    const a=fighterFor(ev.home_team), b=fighterFor(ev.away_team), when=new Date(ev.commence_time);
+    let d=null; if(a&&b&&a!==b) d=M.detail(a,b,when,divFor(a,b),attOf);
+    return {ev,nameA:ev.home_team,nameB:ev.away_team,a,b,when,d,
+      nvA:c?c.pA:null, nBooks:c?c.n:0, bestA:best(ev.home_team), bestB:best(ev.away_team)};
+  });
+}
+async function loadSnaps(){ SNAPS=(await cacheGet(SNAP_KEY))||{}; }
+/* Every pull records Corner's number and the market's for each upcoming fight:
+   the first pull becomes the open, each later one the close. */
+async function snapshot(){
+  const rows=cardRows(); let n=0;
+  for(const r of rows){
+    if(!r.d||r.nvA==null||r.when<=Date.now()) continue;
+    const s=SNAPS[r.ev.id]||(SNAPS[r.ev.id]={a:r.a,b:r.b,start:+r.when});
+    const pt={t:PE_DATA.at,p:r.d.p,nv:r.nvA};
+    if(!s.first) s.first=pt; s.last=pt; n++;
+  }
+  // keep a year of fights
+  for(const k in SNAPS) if(SNAPS[k].start<Date.now()-400*864e5) delete SNAPS[k];
+  if(n) await cacheSet(SNAP_KEY,SNAPS);
+  return n;
+}
+/* Join finished fights to the walk forward log for the result. */
+function resolvedSnaps(){
+  const out=[];
+  for(const s of Object.values(SNAPS)){
+    if(!s.first||!s.last||s.start>Date.now()) continue;
+    const hit=LOG.find(x=>Math.abs(x.date-s.start)<3*864e5&&((x.f1===s.a&&x.f2===s.b)||(x.f1===s.b&&x.f2===s.a)));
+    const yA=hit?(hit.f1===s.a?hit.y:1-hit.y):null;
+    const hrs=(s.last.t-s.first.t)/3600e3;
+    out.push({...s,yA,hrs,
+      move:(s.last.nv-s.first.nv)*Math.sign(s.first.p-s.first.nv),     // toward Corner is positive
+      dis:s.first.p-s.first.nv});
+  }
+  return out;
+}
+function meanCI(xs){ const n=xs.length; if(n<2) return null;
+  const m=xs.reduce((a,x)=>a+x,0)/n, sd=Math.sqrt(xs.reduce((a,x)=>a+(x-m)*(x-m),0)/(n-1)), se=sd/Math.sqrt(n);
+  return {n,m,lo:m-1.96*se,hi:m+1.96*se}; }
+function priceStatus(){
+  if(!PE_S.key) return 'No Odds API key saved.';
+  if(!PE_DATA||!PE_DATA.at) return PE_DATA&&PE_DATA.error?PE_DATA.error:'Not pulled yet.';
+  const mins=Math.round((Date.now()-PE_DATA.at)/60000);
+  return `${PE_DATA.events.length} fights priced, pulled ${mins<1?'just now':mins+' min ago'}`
+    +(PE_DATA.remaining!=null?`, ${PE_DATA.remaining} credits left`:'')+(PE_DATA.error?` (${PE_DATA.error}, showing last good pull)`:'');
+}
+async function refreshPrices(force){
+  PE_DATA=await peFetch(PE_SPORT,PE_S,PE_STORE,force,'h2h');
+  if(M) await snapshot();
+  if(VIEW==='card') renderCard();
+}
+const amer=v=>v==null?'n/a':(v>0?'+':'')+v;
+function renderCard(){
+  const el=$('card'); if(!el) return;
+  const keyForm=`<div class="opts">
+      <input id="peKey" type="password" autocomplete="off" placeholder="The Odds API key" value="${esc(PE_S.key)}" style="flex:1;min-width:200px">
+      <button id="peSave">Save</button><button id="peRefresh">Refresh prices</button></div>
+    <div class="pe-books">${PE_BOOKS.map(([k,n])=>`<label><input type="checkbox" value="${k}" ${PE_S.mine.includes(k)?'checked':''}>${n}</label>`).join('')}</div>
+    <p class="note" style="padding:6px 2px 10px">${esc(priceStatus())}. One pull costs 1 credit for the whole card.
+    Prices refresh on their own at most hourly while the app is open, and every pull adds to the disagreement log below.</p>`;
+  const rows=M?cardRows():[];
+  let body;
+  if(!PE_S.key) body=`<p class="note">Add a free key from the-odds-api.com to see the upcoming card with Corner's number next to the market's.</p>`;
+  else if(!rows.length) body=`<p class="note${PE_DATA&&PE_DATA.error?' err':''}">${PE_DATA&&PE_DATA.error?esc(PE_DATA.error)+'. Check the key above, then Refresh prices.':'No upcoming fights in the last pull.'}</p>`;
+  else body=rows.map(r=>{
+    const gap=r.d&&r.nvA!=null?r.d.p-r.nvA:null;
+    const flag=gap!=null&&Math.abs(gap)>=0.05;
+    const thin=r.d&&Math.min(r.d.n1,r.d.n2)<4;
+    return `<div class="cardrow">
+      <div class="cr-top"><span class="cr-names"><span class="l">${esc(r.nameA)}</span> vs <span class="r">${esc(r.nameB)}</span></span>
+        <span class="cr-when">${r.when.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span></div>
+      ${r.d?`<div class="cr-grid">
+          <span>Corner</span><b class="l">${pc(r.d.p)}</b><b class="r">${pc(1-r.d.p)}</b>
+          <span>Market, no vig</span><b>${r.nvA!=null?pc(r.nvA):'n/a'}</b><b>${r.nvA!=null?pc(1-r.nvA):'n/a'}</b>
+          <span>Best price</span><b>${r.bestA?amer(r.bestA.v)+' '+peShort(r.bestA.k):'n/a'}</b><b>${r.bestB?amer(r.bestB.v)+' '+peShort(r.bestB.k):'n/a'}</b>
+        </div>
+        <div class="cr-foot">${gap!=null?`Corner is ${(100*Math.abs(gap)).toFixed(1)} pts higher than the market on ${esc(gap>=0?r.nameA:r.nameB)}${flag?' <span class="pill">worth researching</span>':''}`:''}
+          ${thin?' <span class="pill warn">thin record</span>':''}</div>`
+        :`<div class="cr-foot">${!r.a||!r.b?'Not rated: '+esc([!r.a?r.nameA:null,!r.b?r.nameB:null].filter(Boolean).join(', '))+' has no UFC fights on record, or is spelled differently.':''}</div>`}
+    </div>`;}).join('');
+  // the test
+  const R=resolvedSnaps(), moved=R.filter(x=>x.hrs>=12&&Math.abs(x.dis)>=0.02);
+  const mv=meanCI(moved.map(x=>x.move));
+  const toward=moved.filter(x=>x.move>0).length;
+  const graded=R.filter(x=>x.yA!=null);
+  const bDiff=meanCI(graded.map(x=>Math.pow(x.last.p-x.yA,2)-Math.pow(x.last.nv-x.yA,2)));
+  let verdict;
+  if(mv&&mv.n>=50){
+    verdict = mv.lo>0?`<b>The market has been moving toward Corner.</b> Over ${mv.n} fights the close moved ${(100*mv.m).toFixed(2)} points toward Corner's side on average, with the whole range above zero. That is evidence Corner sees something before the market prices it. It is still not proof the gaps are bettable: check that the fights it moved toward were not just the thin-record ones.`
+      : mv.hi<0?`<b>The market has been moving away from Corner</b> over ${mv.n} fights, so where they disagree, the market was right first.`
+      : `After ${mv.n} fights the movement range still spans zero: no evidence Corner sees anything the market hasn't priced.`;
+  } else verdict=`This needs about fifty fights where Corner disagreed with the opening number by 2 points or more and prices were pulled at least twelve hours apart. You have ${moved.length}.`;
+  const test=`<h3 style="font-size:15px;font-weight:600;margin:22px 0 8px">Is Corner seeing anything the market isn't?</h3>
+    <div class="flag">${verdict}<br><br>
+      Fights where Corner disagreed with the open: ${moved.length}, market moved toward Corner in ${toward}.
+      ${mv?`Average move toward Corner: ${(100*mv.m).toFixed(2)} pts (95% range ${(100*mv.lo).toFixed(2)} to ${(100*mv.hi).toFixed(2)}).`:''}
+      ${bDiff?`<br>Accuracy at the close on ${bDiff.n} finished fights: Corner's Brier score minus the market's is ${(bDiff.m).toFixed(4)} (below zero means Corner was more accurate).`:''}
+      <br><br>Open is the first pull after a fight appears, close is the last pull before it starts. The more often the app is opened during fight week, the better the close.</div>`;
+  el.innerHTML=keyForm+body+test;
+  $('peSave').onclick=()=>{ PE_S.key=$('peKey').value.trim();
+    PE_S.mine=[...el.querySelectorAll('.pe-books input:checked')].map(x=>x.value); if(!PE_S.mine.length) PE_S.mine=PE_DEFAULT_MINE.slice();
+    peSaveSettings(PE_NS,PE_S); refreshPrices(true); };
+  $('peRefresh').onclick=async e=>{ e.target.disabled=true; e.target.textContent='...'; await refreshPrices(true); };
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const $=id=>document.getElementById(id);
+const pc=x=>(100*x).toFixed(1)+'%';
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const iso=d=>new Date(d).toISOString().slice(0,10);
+
+function makeCombo(rootId,initial,onPick){
+  const root=$(rootId);
+  const inp=root.querySelector('input');
+  const list=root.querySelector('.list');
+  const clr=root.querySelector('.clear');
+  let hi=-1,shown=[];
+  inp.value=initial||'';
+
+  const close=()=>{list.classList.remove('open');inp.setAttribute('aria-expanded','false');hi=-1;};
+  const draw=q=>{
+    const s=q.trim().toLowerCase();
+    shown=(s?NAMES.filter(n=>n.toLowerCase().includes(s)):NAMES).slice(0,60);
+    if(!shown.length){
+      list.innerHTML='<div class="none">No fighter matches that.</div>';
+    }else{
+      list.innerHTML=shown.map((n,i)=>{
+        const m=FMETA.get(n)||{};
+        return `<div data-i="${i}" role="option">${esc(n)}
+          <small>${m.n||0} UFC fight${m.n===1?'':'s'}${m.div?' &middot; '+esc(m.div):''}</small></div>`;
+      }).join('');
+    }
+    list.classList.add('open');inp.setAttribute('aria-expanded','true');
+    list.scrollTop=0;
+  };
+  const pick=n=>{inp.value=n;close();onPick(n);};
+
+  inp.addEventListener('focus',()=>draw(''));
+  inp.addEventListener('input',()=>draw(inp.value));
+  inp.addEventListener('keydown',e=>{
+    if(!list.classList.contains('open'))return;
+    const rows=[...list.querySelectorAll('[data-i]')];
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      e.preventDefault();
+      hi=Math.max(0,Math.min(rows.length-1,hi+(e.key==='ArrowDown'?1:-1)));
+      rows.forEach((r,i)=>r.classList.toggle('hi',i===hi));
+      if(rows[hi])rows[hi].scrollIntoView({block:'nearest'});
+    }else if(e.key==='Enter'){
+      e.preventDefault();
+      if(hi>=0&&shown[hi])pick(shown[hi]);
+      else if(shown.length===1)pick(shown[0]);
+    }else if(e.key==='Escape')close();
+  });
+  /* pointerdown rather than mousedown: on a touch screen the synthesized mouse
+     event is not guaranteed on a plain div, and this list is the whole app. */
+  const tap=e=>{const row=e.target.closest('[data-i]');
+    if(row){e.preventDefault();pick(shown[+row.dataset.i]);}};
+  list.addEventListener('pointerdown',tap);
+  list.addEventListener('mousedown',e=>{if(e.pointerType===undefined)tap(e);});
+  clr.addEventListener('click',()=>{inp.value='';inp.focus();draw('');});
+  document.addEventListener('click',e=>{ if(!root.contains(e.target))close(); });
+  return{get:()=>inp.value,set:v=>{inp.value=v;}};
+}
+
+let comboA=null,comboB=null,divTouched=false;
+
+function renderMatch(){
+  const b=$('matchBody');
+  if(!b.dataset.built){
+    b.innerHTML=`
+    <div class="corners">
+      <div class="corner red"><label for="inA">Red corner</label>
+        <div class="combo" id="cA">
+          <input id="inA" type="text" autocomplete="off" role="combobox"
+            aria-expanded="false" aria-autocomplete="list" placeholder="Search fighter">
+          <button class="clear" type="button" aria-label="Clear">&times;</button>
+          <div class="list" role="listbox"></div>
+        </div></div>
+      <div class="corner blue"><label for="inB">Blue corner</label>
+        <div class="combo" id="cB">
+          <input id="inB" type="text" autocomplete="off" role="combobox"
+            aria-expanded="false" aria-autocomplete="list" placeholder="Search fighter">
+          <button class="clear" type="button" aria-label="Clear">&times;</button>
+          <div class="list" role="listbox"></div>
+        </div></div>
+    </div>
+    <div class="opts">
+      <select id="dv" aria-label="Division"></select>
+      <input id="fdate" type="date" aria-label="Fight date">
+      <button id="swap" style="width:auto;padding:0 16px">Swap</button>
+      <button id="refresh">Refresh</button>
+    </div>
+    <div id="verdict"></div>`;
+    b.dataset.built='1';
+    comboA=makeCombo('cA','',onPick);
+    comboB=makeCombo('cB','',onPick);
+    $('dv').innerHTML=DIVS.map(d=>`<option>${esc(d)}</option>`).join('');
+    $('dv').onchange=()=>{divTouched=true;drawVerdict();};
+    $('fdate').value=iso(Date.now());
+    $('fdate').onchange=drawVerdict;
+    $('swap').onclick=()=>{const a=comboA.get();comboA.set(comboB.get());
+      comboB.set(a);autoDiv();drawVerdict();};
+    $('refresh').onclick=async e=>{e.target.disabled=true;e.target.textContent='...';
+      await boot(true);e.target.disabled=false;e.target.textContent='Refresh';};
+  }
+  drawVerdict();
+}
+function onPick(){autoDiv();drawVerdict();}
+
+/* The division drives a weight class change penalty. Defaulting it to whichever
+   division has the most recent fights meant most matchups silently carried a
+   phantom move, worth about a point of probability. Read it off the fighters. */
+function autoDiv(){
+  if(divTouched)return;
+  const a=FMETA.get(comboA.get()),b=FMETA.get(comboB.get());
+  let d=null;
+  if(a&&b)d=(a.last>=b.last?a.div:b.div);
+  else if(a)d=a.div; else if(b)d=b.div;
+  if(d&&DIVS.includes(d))$('dv').value=d;
+}
+
+function drawVerdict(){
+  const a=comboA.get(),bn=comboB.get(),dv=$('dv').value;
+  const el=$('verdict');
+  if(!NAMES.includes(a)||!NAMES.includes(bn)){
+    el.innerHTML='<p class="note">Search and select a fighter for each corner.</p>';return;}
+  if(a===bn){el.innerHTML='<p class="note">Pick two different fighters.</p>';return;}
+  const dateStr=$('fdate').value;
+  const when=dateStr?new Date(dateStr+'T12:00:00Z'):new Date();
+  const d=M.detail(a,bn,when,dv,attOf);
+  const thin=Math.min(d.n1,d.n2);
+  const bars=[['Skill rating',d.c.skill],['Striking',d.c.striking],
+              ['Grappling',d.c.grappling],['Finishing',d.c.finishing],
+              ['Age',d.c.age],['Reach',d.c.reach],
+              ['Ring rust',d.c.layoff],['Stance',d.c.stance]]
+    .filter(x=>Math.abs(x[1])>0.002);
+  const mx=Math.max(0.12,...bars.map(x=>Math.abs(x[1])));
+  const ma=FMETA.get(a),mb=FMETA.get(bn);
+  const divWarn=(ma&&mb&&ma.div&&mb.div&&(ma.div!==dv||mb.div!==dv))
+    ? `<div class="flag">Weight class move priced in. ${esc(a)} last fought at
+       ${esc(ma.div)} and ${esc(bn)} at ${esc(mb.div)}, against ${esc(dv)} here.</div>`:'';
+  el.innerHTML=`
+  <div class="verdict">
+    <div class="names"><span class="l">${esc(a)}</span><span class="r">${esc(bn)}</span></div>
+    <div class="probbar"><span style="width:${(100*d.p).toFixed(1)}%"></span></div>
+    <div class="probnums"><span class="l">${pc(d.p)}</span><span class="r">${pc(1-d.p)}</span></div>
+    ${thin<4?`<div class="flag"><b>Thin record.</b>
+      ${d.n1<4?esc(a)+' has '+d.n1+' UFC fight'+(d.n1===1?'':'s')+' on record. ':''}
+      ${d.n2<4?esc(bn)+' has '+d.n2+' UFC fight'+(d.n2===1?'':'s')+' on record. ':''}
+      Before accounting for that, the read was ${pc(d.pRaw)} to ${pc(1-d.pRaw)}.
+      It has been pulled toward even because the model has too little to go on.</div>`
+      :(Math.abs(d.pRaw-d.p)>0.03?`<div class="flag">Raw read was ${pc(d.pRaw)}, pulled to
+      ${pc(d.p)} for uncertainty in the two records.</div>`:'')}
+    ${divWarn}
+    <div class="drivers">
+      <h3>What is driving it</h3>
+      ${bars.map(([lab,v])=>{
+        const w=Math.abs(v)/mx*50;
+        return `<div class="drow"><span style="color:var(--mute)">${lab}</span>
+          <span class="dtrack"><span class="dfill" style="
+            ${v>0?`left:50%;width:${w}%;background:var(--red)`
+                 :`right:50%;width:${w}%;background:var(--blue)`}"></span></span>
+          <span class="dval" style="color:${v>0?'var(--red)':'var(--blue)'}">
+            ${v>0?'+':''}${v.toFixed(2)}</span></div>`;}).join('')
+        ||'<p class="note" style="padding:4px 0">Evenly matched on every input.</p>'}
+    </div>
+    <div class="grid3">
+      <div class="stat"><b>${d.rA.SLpM.toFixed(1)} / ${d.rB.SLpM.toFixed(1)}</b><span>strikes landed per min</span></div>
+      <div class="stat"><b>${d.rA.SApM.toFixed(1)} / ${d.rB.SApM.toFixed(1)}</b><span>absorbed per min</span></div>
+      <div class="stat"><b>${d.rA.TD15.toFixed(1)} / ${d.rB.TD15.toFixed(1)}</b><span>takedowns per 15</span></div>
+      <div class="stat"><b>${(100*d.rA.strDef).toFixed(0)} / ${(100*d.rB.strDef).toFixed(0)}%</b><span>striking defense</span></div>
+      <div class="stat"><b>${d.n1} / ${d.n2}</b><span>UFC fights</span></div>
+      <div class="stat"><b>${d.age1?d.age1.toFixed(0):'n/a'} / ${d.age2?d.age2.toFixed(0):'n/a'}</b><span>age</span></div>
+    </div>
+  </div>`;
+}
+
+/* A reference opponent: average rating, peak age, median reach, orthodox,
+   just fought, league average career statistics. Ranking against him is what
+   the model actually thinks, which the raw rating is not. */
+const REF='\u0000ref';
+function refAttr(){return{reach:MEDREACH,stance:'Orthodox',
+  dob:new Date(Date.now()-P.age_peak*365.25*864e5)};}
+function strengthOf(f,when){
+  const at=n=>n===REF?refAttr():attOf(n);
+  const saved=M.f.get(REF);
+  M.f.set(REF,Object.assign({},BLANK,{n:20,last:when,div:M.get(f).div}));
+  const d=M.detail(f,REF,when,M.get(f).div,at);
+  if(saved)M.f.set(REF,saved);else M.f.delete(REF);
+  return d.p;
+}
+
+function renderRank(){
+  const dv=$('rankDiv').value;
+  const when=new Date();
+  const cut=Date.now()-900*864e5;
+  const rows=[...FMETA.entries()]
+    .filter(([f,m])=>m.n>=3&&m.last>=cut&&(dv==='All divisions'||m.div===dv))
+    .map(([f,m])=>{const a=M.get(f);
+      return{f,r:a.r,n:a.n,div:m.div,
+        live:M.stale(f,when,a.div),
+        idle:Math.round((when-a.last)/864e5),
+        s:strengthOf(f,when)};})
+    .sort((a,b)=>b.s-a.s).slice(0,40);
+  $('rank').innerHTML=rows.length?`<table>
+    <thead><tr><th>Fighter</th><th>Strength</th><th>Rating</th><th>Fights</th><th>Certainty</th></tr></thead>
+    <tbody>${rows.map(x=>`<tr>
+      <td>${esc(x.f)}<div style="font-size:11.5px;color:var(--dim);font-weight:400">${
+        esc(x.div||'')}${x.idle>400?' &middot; '+x.idle+' days idle':''}</div></td>
+      <td class="pos">${pc(x.s)}</td>
+      <td class="${x.r>=0?'pos':'neg'}">${x.r>0?'+':''}${x.r.toFixed(2)}</td>
+      <td>${x.n}</td>
+      <td>${(100*(1-Math.min(1,x.live/P.P_max))).toFixed(0)}%</td>
+    </tr>`).join('')}</tbody></table>
+    <p class="note">Active fighters only, three or more UFC fights, last thirty months.
+    <b>Strength</b> is the model's own probability against an average opponent today, which
+    is the order it actually believes. <b>Rating</b> is the skill term alone, learned as
+    what is left after age, reach and the statistical inputs are accounted for, so it is
+    not a ranking on its own and an older fighter carries a high one precisely because he
+    was already docked elsewhere. <b>Certainty</b> is measured the same way the forecast
+    measures it, so it falls during a layoff rather than after one.</p>`
+    :'<p class="note">No qualifying fighters in this division.</p>';
+}
+
+function renderLog(){
+  if(!LOG.length){$('log').innerHTML='<p class="note">No recent fights.</p>';return;}
+  let n=0,w=0,ls=0,br=0;
+  const bins=Array.from({length:6},()=>({said:0,won:0,n:0}));
+  for(const x of LOG){
+    n++; const right=(x.p>.5)===(x.y===1); if(right)w++;
+    ls+=-Math.log(Math.max(1e-9,x.y===1?x.p:1-x.p));
+    br+=Math.pow(x.p-x.y,2);
+    const conf=Math.max(x.p,1-x.p);
+    const b=Math.min(5,Math.floor((conf-0.5)/0.05));
+    bins[b].n++; bins[b].said+=conf; bins[b].won+=right?1:0;
+  }
+  const A=aucOf(LOG);
+  const rows=[...LOG].reverse().slice(0,60).map(x=>{
+    const win=x.y===1?x.f1:x.f2, hit=(x.p>.5)===(x.y===1);
+    const conf=Math.max(x.p,1-x.p);
+    return `<tr>
+      <td>${esc(x.f1)} / ${esc(x.f2)}
+        <div style="font-size:11.5px;color:var(--dim);font-weight:400">
+          ${iso(x.date)} &middot; ${esc(x.div)}</div></td>
+      <td style="font-weight:600">${esc(win.split(' ').slice(-1)[0])}</td>
+      <td>${pc(conf)}</td>
+      <td class="${hit?'pos':'neg'}">${hit?'yes':'no'}</td>
+    </tr>`;}).join('');
+  $('log').innerHTML=`
+  <div class="grid3">
+    <div class="stat"><b>${(100*w/n).toFixed(1)}%</b><span>winner picked (${w} of ${n})</span></div>
+    <div class="stat"><b>${A.toFixed(3)}</b><span>AUC, live</span></div>
+    <div class="stat"><b>${(ls/n).toFixed(3)}</b><span>log loss (coin flip .693)</span></div>
+    <div class="stat"><b>${(br/n).toFixed(3)}</b><span>Brier</span></div>
+    <div class="stat"><b>${n}</b><span>fights scored</span></div>
+    <div class="stat"><b>${iso(LOG[0].date)}</b><span>logged since</span></div>
+  </div>
+  <p class="note" style="padding:14px 2px 6px">Each fight scored against what the model
+  said before it happened, computed here rather than quoted from an old test run. No market
+  comparison appears because closing prices are not in this data set, and pasting a benchmark
+  from a different set of fights next to these numbers would be misleading.</p>
+  <h3 style="font-size:15px;font-weight:600;margin:18px 0 8px">Is it as confident as it should be</h3>
+  <div class="drivers">
+  ${bins.map((b,i)=>{
+    if(!b.n)return '';
+    const said=100*b.said/b.n,got=100*b.won/b.n,thin=b.n<25;
+    return `<div class="drow" style="grid-template-columns:74px 1fr 104px">
+      <span style="color:var(--red)">${said.toFixed(0)}% said</span>
+      <span class="dtrack"><span class="dfill" style="left:0;width:${Math.min(100,got)}%;
+        background:${!thin&&Math.abs(said-got)>12?'var(--warn)':'var(--blue)'}"></span></span>
+      <span style="text-align:right;color:var(--blue)">${got.toFixed(0)}% won, n=${b.n}${thin?'*':''}</span>
+    </div>`;}).join('')||'<p class="note">Not enough fights yet to check calibration.</p>'}
+  </div>
+  <p class="note" style="padding:8px 2px 0;font-size:12.5px">Bins marked * hold fewer than
+  twenty five fights and are noise. A gap that survives a full year of cards is the signal
+  to re-fit, not one bad bin.</p>
+  <h3 style="font-size:15px;font-weight:600;margin:20px 0 8px">Fight by fight</h3>
+  <table><thead><tr><th>Fight</th><th>Won</th><th>Confidence</th><th>Right</th></tr></thead>
+  <tbody>${rows}</tbody></table>`;
+}
+function aucOf(rows){
+  const pos=rows.filter(x=>x.y===1).map(x=>x.p).sort((a,b)=>a-b);
+  const neg=rows.filter(x=>x.y===0).map(x=>x.p);
+  if(!pos.length||!neg.length)return 0.5;
+  let s=0;
+  for(const v of neg){let lo=0,hi=pos.length;
+    while(lo<hi){const mid=(lo+hi)>>1;pos[mid]<=v?lo=mid+1:hi=mid;}
+    let eq=0,i=lo-1;while(i>=0&&pos[i]===v){eq++;i--;}
+    s+=(pos.length-lo)+0.5*eq;}
+  return s/(pos.length*neg.length);
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+function switchView(v){
+  VIEW=v;
+  $('matchView').style.display=v==='match'?'':'none';
+  $('rankView').style.display=v==='rank'?'':'none';
+  $('logView').style.display=v==='log'?'':'none';
+  $('cardView').style.display=v==='card'?'':'none';
+  $('tabMatch').classList.toggle('on',v==='match');
+  $('tabRank').classList.toggle('on',v==='rank');
+  $('tabLog').classList.toggle('on',v==='log');
+  $('tabCard').classList.toggle('on',v==='card');
+  if(v==='match')renderMatch();
+  if(v==='rank')renderRank();
+  if(v==='log')renderLog();
+  if(v==='card')renderCard();
+}
+
+function packFit(){
+  return{v:MODEL_VERSION,through:+THROUGH,
+    model:M.snapshot(),log:LOG,divs:DIVS,medreach:MEDREACH,
+    att:[...ATT].map(([k,a])=>[k,{reach:isFinite(a.reach)?a.reach:null,stance:a.stance,dob:a.dob?+a.dob:null}]),
+    fmeta:[...FMETA].map(([k,m])=>[k,{n:m.n,div:m.div,last:m.last}])};
+}
+function unpackFit(c){
+  if(!c||c.v!==MODEL_VERSION||!Array.isArray(c.att))return false;
+  try{
+    M=UFCModel.from(c.model);LOG=c.log;DIVS=c.divs;MEDREACH=c.medreach;
+    FMETA=new Map(c.fmeta);
+    ATT=new Map(c.att.map(([k,a])=>[k,{reach:a.reach==null?NaN:a.reach,stance:a.stance,dob:a.dob==null?null:new Date(a.dob)}]));
+    NAMES=[...FMETA.keys()].sort((a,b)=>a.localeCompare(b));
+    THROUGH=new Date(c.through);
+    return true;
+  }catch(e){return false;}
+}
+
+function indexFighters(F){
+  const cut=Date.now()-900*864e5;
+  FMETA=new Map();
+  for(const g of F){
+    if(+g.date<cut)continue;
+    for(const f of [g.f1,g.f2]){
+      let m=FMETA.get(f); if(!m){m={n:0,div:null,last:0};FMETA.set(f,m);}
+      if(+g.date>m.last){m.last=+g.date;m.div=g.div;}
+    }
+  }
+  for(const[f,m]of FMETA)m.n=M.get(f).n;
+  NAMES=[...FMETA.keys()].sort((a,b)=>a.localeCompare(b));
+  const dc={};
+  for(const g of F) if(+g.date>=cut) dc[g.div]=(dc[g.div]||0)+1;
+  DIVS=Object.keys(dc).sort((a,b)=>dc[b]-dc[a]).slice(0,14);
+}
+
+async function boot(force){
+  try{
+    if(force)$('matchBody').innerHTML='<div class="skel"></div>';
+    const d=await pull(force);
+    const t0=performance.now();
+
+    let ok=false;
+    if(!force){
+      try{const c=await cacheGet(FITKEY);
+        if(c&&c.rawAt===d.at)ok=unpackFit(c);}catch(e){}
+    }
+    if(!ok){
+      const F=build(d);
+      if(!F.length)throw new Error('No completed fights parsed from the upstream files.');
+      const r=fit(F); M=r.m; LOG=r.log;
+      THROUGH=F[F.length-1].date;
+      indexFighters(F);
+      cacheSet(FITKEY,Object.assign(packFit(),{rawAt:d.at}));
+      FIT_CACHED=false;
+    } else FIT_CACHED=true;
+    FIT_MS=Math.round(performance.now()-t0);
+    F_INDEX=null;
+
+    $('rankDiv').innerHTML=['All divisions',...DIVS].map(x=>`<option>${esc(x)}</option>`).join('');
+    $('rankDiv').onchange=renderRank;
+
+    const nF=M.f.size;
+    $('sub').textContent=`${nF.toLocaleString()} fighters rated, through ${iso(THROUGH)}`;
+    $('foot1').textContent=`Data ${d.cached?'from cache':'refreshed'} `
+      +new Date(d.at).toLocaleString()+(d.stale?' (network unavailable)':'')
+      +`. Ratings ${FIT_CACHED?'restored':'rebuilt'} in ${FIT_MS} ms.`;
+    const A=LOG.length?aucOf(LOG):null;
+    $('foot2').textContent=`Model ${MODEL_VERSION}, fitted ${FIT_DATE}. `
+      +`Statistical features fitted on every fight before 2022 and tested after: `
+      +`held out AUC 0.680 against 0.658 without them. `
+      +(A?`Live on the last ${LOG.length} fights: AUC ${A.toFixed(3)}.`:'');
+
+    const b=$('matchBody');b.dataset.built='';
+    switchView(VIEW);
+  }catch(e){
+    $('matchBody').innerHTML=`<p class="note err">${esc(e.message)}</p>`
+      +`<p class="note">${/missing expected column/.test(e.message)
+        ? 'This is a data format change upstream, not a connection problem. The '
+          +'ufcstats scrape has been altered and the parser needs updating.'
+        : 'Check the connection and try again. If it keeps failing the source '
+          +'files may have moved.'}</p>`;
+  }
+}
+
+$('tabMatch').onclick=()=>switchView('match');
+$('tabRank').onclick=()=>switchView('rank');
+$('tabLog').onclick=()=>switchView('log');
+$('tabCard').onclick=()=>switchView('card');
+$('refresh2').onclick=async e=>{e.target.disabled=true;e.target.textContent='...';
+  await boot(true);e.target.disabled=false;e.target.textContent='Refresh';};
+loadSnaps().catch(()=>{}).then(()=>boot(false)).then(()=>{ if(PE_S.key) return refreshPrices(false); });
+/* The close is the last pull before a fight starts, so check again whenever the
+   app comes back into view and every 15 minutes while open. PE_TTL keeps the
+   actual API calls to at most one an hour. */
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&M&&PE_S.key) refreshPrices(false); });
+setInterval(()=>{ if(!document.hidden&&M&&PE_S.key) refreshPrices(false); },15*60*1000);
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

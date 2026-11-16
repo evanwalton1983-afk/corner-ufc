@@ -4,7 +4,8 @@
   "description": "Test harness for the Corner UFC app. Not deployed.",
   "scripts": {
     "snapshot": "node test/snapshot.mjs",
-    "test": "node test/run-all.mjs"
+    "test": "node test/run-all.mjs",
+    "refit": "node tools/refit.mjs --fit"
   },
   "devDependencies": {
     "ajv": "^8.20.0",

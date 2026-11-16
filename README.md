@@ -35,6 +35,7 @@ Everything else is never deployed:
 | `docs/war-room-export-report.md` | what the export sends, what it cannot, and the test results |
 | `docs/sample-payload-corner_ufc-2026-09-26.json` | a full sample payload (real fighters and model numbers, made up card and prices) |
 | `test/` | the acceptance suite, frozen ufcstats files and fixtures |
+| `tools/refit.mjs` | scores the model walk forward on the frozen data, and refits it |
 
 ## Tests
 
@@ -44,16 +45,25 @@ npx playwright install chromium   # once, for the browser handoff tests
 npm test
 ```
 
+The suite needs no network: the four ufcstats files, the Odds API response,
+the glicko2 library and a copy of the 2.1.0 app (`test/fixtures/original-2.1.0.html`,
+for the request comparison) are all in the repo, so it passes from a fresh clone.
+
 The suite boots the app in jsdom on frozen copies of the four ufcstats files
 with a frozen clock (2026-09-23 19:00 UTC) and a made up Odds API response, and:
 
 1. snapshots every displayed line in every tab, with and without prices, on a
-   fresh and a restored cache, and compares it to `test/baseline/before.json`,
-   taken from the 2.1.0 app before any change;
+   fresh and a restored cache, and compares it to `test/baseline/2.4.0.json`.
+   2.4 changed the forecasts on purpose, so that is the reference now;
+   `test/baseline/before.json` is the 2.1.0 app, kept for the record. After a
+   deliberate change, run `npm run snapshot` and copy `test/out/after.json`
+   over the baseline;
 2. checks the War Room payload against the contract schema, the War Room's own
    import pipeline (when `../war-room` is checked out next door), and the Card
    tab it came from;
-3. runs the handoff in real Chromium across three local origins.
+3. runs the handoff in real Chromium across three local origins;
+4. checks every 2.4 change (`test/v24.test.mjs`), including that
+   `tools/refit.mjs` still reproduces the numbers quoted below.
 
 `node test/make-fixtures.mjs` rebuilds the Odds API and disagreement log
 fixtures from the frozen data; the committed ones are what the baseline used.
@@ -88,7 +98,14 @@ announced irregularly, so a fixed slate view would be empty most of the time.
 The matchup picker is the right shape for the sport: you already know who is
 fighting, and the model answers for any pairing you name.
 
-## The three tabs
+## The five tabs
+
+Every forecast opens with a **Pick**: one line naming the expected winner, how
+strong a favorite (toss-up below 55%, lean, clear, strong from 72%), and where
+the number comes from. On a fight the betting market has priced, the pick is the
+market's favorite, because in the side by side test below the market picked more
+winners than Corner; Corner's own number sits beside it with "Corner agrees" or
+"Corner picks the other fighter". Without a price, the pick is Corner's.
 
 **Matchup.** Pick a red corner and a blue corner. You get a win probability, a
 breakdown of what is driving it, and the fight counts, ages, and reaches behind
@@ -104,6 +121,16 @@ which falls during long layoffs and on a weight class change.
 **Recent.** Every fight from roughly the last year scored against what the model
 said beforehand, so the app grades itself rather than asking you to trust a
 backtest.
+
+**Card.** The upcoming card from The Odds API (free key), fights first, each with
+its pick, Corner's number, the market's no-vig number, Glicko-2, and the best
+price at your books. Below: Send to War Room, the key and books, and the running
+test of whether Corner sees anything before the market does. A fighter the data
+has never seen is rated as a debut instead of being skipped, and says so.
+
+**Settings.** The second opinion cutoffs, and a backup of the disagreement log:
+Export writes it to a file, Import merges a file back in, and "Keep it on this
+device" asks the browser not to clear it.
 
 ## The uncertainty machinery, and why it is the point
 
@@ -129,7 +156,8 @@ build a fight model that looks excellent and predicts nothing.
 
 ## Honest performance
 
-Tested on 2,754 fights against closing moneylines:
+Tested on 2,754 fights against closing moneylines (the 2.0 evaluation, in the
+Python project):
 
 | | log loss | accuracy | AUC |
 |---|---|---|---|
@@ -147,33 +175,36 @@ market the model adds no significant information (p = 0.084).
 **Use it as a forecaster. It does not beat the book.** Both statements are
 supported by the numbers above and they are not in conflict.
 
+Walk forward on the frozen data in this repo, fitted on fights before 2022 and
+scored on the 2,435 since, by `node tools/refit.mjs`:
+
+| | winners picked | log loss | AUC |
+|---|---|---|---|
+| 2.3.0 | 61.36% | 0.64677 | 0.6703 |
+| 2.4.0 | 62.79% | 0.64201 | 0.6791 |
+| 2.4.0, fights with a debutant | 58.15% | 0.65766 | 0.6399 |
+
 ## Updating
 
 The upstream data refreshes daily from ufcstats.com. The app caches for six hours,
 then re-pulls and rebuilds ratings from scratch in roughly 60 ms. Nothing to
 maintain.
 
-To retune hyperparameters after more fights accumulate, run `ufc_eval.py` in the
-Python project and paste the new values into the `P` object near the top of the
-script block in `index.html`.
+To retune after more fights accumulate, copy the four current ufcstats CSV files
+into a folder and run `node tools/refit.mjs --fit --data <folder>`. It fits only
+on fights before the split (`--split`, default 2022-01-01), prints the scores
+before and after, and prints the values to paste into `index.html`: `b_age` in
+`P`, `STAT_DECAY`, and the `FB` coefficients. The other rating parameters still
+come from the Python reference.
 
 
 ---
 
 ## Verification
 
-Both apps are executed in a real DOM (jsdom) as part of the build, not just
-syntax-checked. Every tab is clicked, every render path runs, and the suite
-asserts:
-
-- all tabs render non-empty content with zero runtime errors
-- the model reproduces the Python reference exactly
-- a renamed upstream column produces a loud, accurate error rather than silent
-  nulls and confident nonsense
-- interactive paths work end to end (search, select, expand, sort, week stepping)
-
-Run `node render_test.js` and `node interact_test.js` from the project root after
-any change.
+The app runs in a real DOM (jsdom) and in real Chromium, not just a syntax
+check. Every tab is clicked and every render path runs. Run `npm test` after any
+change; the Tests section above lists what it checks.
 
 ## Storage
 
@@ -188,6 +219,11 @@ The picker is a filtered search box, not a dropdown. An earlier version used a
 native select holding roughly a thousand active fighters, which rendered 94KB of
 DOM and was unusable on a phone. The search version renders 3KB and each result
 row shows fight count and division so same-name fighters can be told apart.
+
+Since 2.4 it searches every fighter with a UFC fight and every ufcstats profile
+with none yet (rated as a debut), about 4,600 names, still showing at most 60
+rows. Active fighters list first, then likely debutants, then former fighters.
+Accents and case are ignored.
 
 Keyboard support: arrow keys to move, Enter to pick, Escape to close.
 
@@ -211,3 +247,24 @@ RDs run from about 115 to 210). The Send to War Room export carries
 `glicko2_prob_win`, `glicko2_confidence`, `glicko2_rd` and `glicko2_opponent_rd`
 in each record's `model.projection`, plus `openskill_prob_win` when the OpenSkill
 comparison is on. Run `node test/second-opinion.test.mjs` for its checks.
+
+Since 2.4 the Matchup line says what a disagreement has meant, counted in the
+replay on every fight since 2022 with each forecast made before the fight: when
+Glicko-2 and Corner disagreed, Corner still picked the winner in 59% of 794
+fights (65% of 1,641 when they agreed). A disagreement is a reason to look
+closer, not a reversal.
+
+## Weight classes and shared names (2.4)
+
+ufcstats spells one class many ways ("UFC Interim Heavyweight Title Bout",
+"Ultimate Fighter 28 Heavyweight Tournament"). Each spelling used to be its own
+division, so a title fight counted as a weight class move and champions were
+filed under "Interim Heavyweight". Every label now maps to its class; catch
+weight and open weight are no division at all.
+
+Eight names in ufcstats belong to two fighters. Each fight is matched to the
+profile whose weight is that fight's class limit. Bruno Silva is now two
+fighters, "Bruno Silva (Flyweight)" and "Bruno Silva (Middleweight)", and Jean
+Silva, Mike Davis, Michael McDonald and Victor Valenzuela take the right
+birthday and reach. The War Room export sends the ufcstats name with the
+resolved fighter id.

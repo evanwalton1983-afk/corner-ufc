@@ -148,6 +148,15 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
 .set-grid{display:grid;grid-template-columns:1fr 110px;gap:8px 12px;align-items:center;font-size:14px;margin-bottom:10px}
 .set-grid input[type=number]{width:100%}
 .set-grid input[type=checkbox]{min-height:0;width:22px;height:22px;padding:0;justify-self:start;accent-color:var(--warn)}
+/* the pick (2.4): one plain line that names the expected winner */
+.pick{font-size:14px;line-height:1.55;color:var(--mute);margin:0 0 10px}
+.pick b{font-weight:650}
+.pick b.l{color:var(--red)} .pick b.r{color:var(--blue)}
+.cr-pick{font-size:13.5px;line-height:1.55;color:var(--mute);margin:-2px 0 8px}
+.cr-pick b{font-weight:650} .cr-pick b.l{color:var(--red)} .cr-pick b.r{color:var(--blue)}
+.cr-sum{font-size:13px;color:var(--mute);line-height:1.6;margin:0 0 10px}
+.pill.ok{border-color:var(--ok);color:var(--ok)}
+.search-hint{font-size:11.5px;color:var(--dim);margin:4px 2px 0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:420px){
   .tabs{gap:4px}
@@ -191,6 +200,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
 </section>
 
 <section id="cardView" style="display:none">
+  <div id="card"></div>
   <div id="wrPanel" class="wr" data-wr aria-label="Send to War Room">
     <div class="wr-bar">
       <button id="wrSend" disabled>Send to War Room</button>
@@ -217,7 +227,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
       import by hand.</p>
     </details>
   </div>
-  <div id="card"></div>
+  <div id="cardTools"></div>
 </section>
 
 <section id="settingsView" style="display:none">
@@ -299,14 +309,45 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);
    6. Nothing on the read path mutates the model. detail() called touch(),
       which grew the rating map by two entries every time it was handed a
       name it had not seen.
+
+   v2.4.0, and the evidence. Every number below comes from
+   tools/refit.mjs on the frozen data in test/fixtures (8,742 decided fights
+   through 2026-09-19), each forecast made before its fight. Fitting saw only
+   fights before 2022; the 2,435 fights since are the test.
+
+                          winners picked   log loss   AUC
+        2.3.0                  61.36%       .64677   .6703
+        2.4 data fixes         62.14%       .64568   .6735
+        2.4.0 as shipped       62.79%       .64201   .6791
+
+   Against 2.3 on the same fights the log loss gain is .00476 a fight with
+   standard error .00130 (z 3.67). The pick changed on 133 fights: 2.4 right
+   on 84, 2.3 on 49. Calibration held: 70% calls won 76%, 60% calls won 66%.
+
+   7. Weight classes are read as classes. Each spelling of a class was its own
+      division, so 198 title and tournament bouts counted as a weight class
+      move, and Aspinall, Pereira and Gane were filed under Interim
+      Heavyweight. Catch weight is no longer a move or a division.
+   8. Names two fighters share are told apart (see splitShared). Jean Silva
+      had been aged 48 off another man's birthday.
+   9. b_age 0.0894 -> 0.1301 and the twelve feature coefficients refit
+      together. The old age term was fitted before the statistical features
+      existed and was too weak beside them.
+   10. Recency weighting of career statistics was tried (STAT_DECAY) and left
+      at 1: on the training fights it was a tie (.65882 against .65883), so
+      the simpler model ships. The hook stays for the next refit.
+   11. A debutant is rated, not skipped. The model always could; the app only
+      looked for fighters with a UFC fight. Since 2022, fights with a debutant
+      are 19% of the card and Corner picks 58.2% of them.
    ============================================================ */
 
-const MODEL_VERSION='2.3.0';
-const FIT_DATE='2026-09-19';
+const MODEL_VERSION='2.4.0';
+const FIT_DATE='2026-11-16';
 
-/* Rating parameters from the offline reference, unchanged. */
+/* Rating parameters from the offline reference, unchanged except b_age, which
+   2.4 refit (0.0894 before): see the 2.4 notes at the top. */
 const P = {"R":1.2279,"P0":1.296,"q_game":0.0954,"q_layoff":0.3974,"q_movediv":0.7521,
-  "P_max":2.8167,"defl":1.0578,"lr":0.9877,"b_reach":0.0203,"b_age":0.0894,
+  "P_max":2.8167,"defl":1.0578,"lr":0.9877,"b_reach":0.0203,"b_age":0.1301,
   "age_peak":28.4392,"b_lay":0.1735,"b_south":0.0496};
 
 /* Feature coefficients, fitted by coordinate descent on walk forward log loss
@@ -316,9 +357,13 @@ const P = {"R":1.2279,"P0":1.296,"q_game":0.0954,"q_layoff":0.3974,"q_movediv":0
    are collinear with each other, so a couple carry a sign that looks wrong on
    its own while the group they belong to is firmly positive. That is exactly
    why the driver display groups them. */
-const FB={SLpM:0.222252, SApM:-0.310144, strAcc:0.723504, strDef:2.256819,
-  TD15:0.260305, TDacc:-1.882751, TDdef:2.010545, ctrl:-0.580924,
-  KD15:-0.084602, sub15:-0.100638, finW:0.507546, finL:-0.769900};
+const FB={SLpM:0.245588, SApM:-0.288434, strAcc:0.83203, strDef:2.595342,
+  TD15:0.278526, TDacc:-2.618907, TDdef:2.010545, ctrl:-0.580924,
+  KD15:-0.084602, sub15:-0.100638, finW:0.431414, finL:-1.00087};
+/* 2.3 values, before the 2.4 refit:
+   SLpM 0.222252, SApM -0.310144, strAcc 0.723504, strDef 2.256819, TD15 0.260305,
+   TDacc -1.882751, TDdef 2.010545, ctrl -0.580924, KD15 -0.084602, sub15 -0.100638,
+   finW 0.507546, finL -0.769900 */
 const FKEY=['SLpM','SApM','strAcc','strDef','TD15','TDacc','TDdef','ctrl','KD15','sub15','finW','finL'];
 const FGROUP={striking:['SLpM','SApM','strAcc','strDef'],
   grappling:['TD15','TDacc','TDdef','ctrl'],
@@ -326,6 +371,10 @@ const FGROUP={striking:['SLpM','SApM','strAcc','strDef'],
 /* shrinkage: a debutant's single fight must not become a career rate */
 const K_MIN=15, K_ATT=60, K_N=3;
 const SCALE=1.00;
+/* Recency (2.4): before a fight's statistics are added to a career, the
+   career so far is multiplied by this, so a fighter's last few fights count
+   for more than his first few. 1 would be the 2.3 behaviour. */
+const STAT_DECAY=1;
 
 const SIG=z=>1/(1+Math.exp(-Math.max(-30,Math.min(30,z))));
 
@@ -401,6 +450,22 @@ const roundLens=tf=>{const m=(tf||'').match(/\(([\d\- ]+)\)/);
   return m?m[1].split('-').map(x=>+x.trim()).filter(x=>x>0):[5,5,5,5,5];};
 const isFinish=m=>/KO\/TKO|Submission|Doctor/i.test(m||'');
 
+/* WEIGHT CLASSES (2.4)
+   ufcstats writes one class many ways: "UFC Interim Heavyweight Title Bout",
+   "Ultimate Fighter 28 Heavyweight Tournament", "Heavyweight Bout". Each
+   spelling used to be its own division, so a title fight read as a weight
+   class move (198 times in the history) and a champion was filed under
+   "Interim Heavyweight" instead of Heavyweight. Every label now maps to its
+   class. Catch weight and open weight map to none: they are not a move, and
+   they do not change the division a fighter is filed under. Order matters:
+   Women's before men's, Light Heavyweight before Heavyweight. */
+const CLASSES=[["Women's Strawweight",115],["Women's Flyweight",125],["Women's Bantamweight",135],["Women's Featherweight",145],
+  ['Light Heavyweight',205],['Super Heavyweight',0],['Heavyweight',265],['Middleweight',185],['Welterweight',170],
+  ['Lightweight',155],['Featherweight',145],['Bantamweight',135],['Flyweight',125],['Strawweight',115]];
+function divClass(label){ const s=String(label||''); for(const[c]of CLASSES) if(s.includes(c)) return c; return null; }
+const classLbs=c=>{ const x=CLASSES.find(k=>k[0]===c); return x?x[1]:null; };
+const lbsOf=s=>{ const m=String(s||'').match(/^(\d+)\s*lbs/); return m?+m[1]:null; };
+
 /* ============================================================
    MODEL
    One record per fighter: rating, uncertainty, count, last seen, last
@@ -409,9 +474,11 @@ const isFinish=m=>/KO\/TKO|Submission|Doctor/i.test(m||'');
 const BLANK=Object.freeze({r:0,P:P.P0,n:0,last:null,div:null,
   min:0,sl:0,sa:0,osl:0,osa:0,tl:0,ta:0,otl:0,ota:0,ctrl:0,kd:0,sub:0,
   nf:0,winFin:0,lossFin:0});
+const DECAY_KEYS=['min','sl','sa','osl','osa','tl','ta','otl','ota','ctrl','kd','sub','nf','winFin','lossFin'];
 
 class UFCModel{
   constructor(p=P){Object.assign(this,p);
+    this.decay=STAT_DECAY;
     this.f=new Map();
     /* running league means, so every rate is shrunk toward the sport as it
        was at the time, not as it is now */
@@ -474,11 +541,13 @@ class UFCModel{
       const K=Pu/(Pu+this.R);
       a.r=a.r+this.lr*K*s*(g.y-d.p);
       a.P=(1-K)*Pu+this.q_game;
-      a.n=a.n+1; a.last=g.date; a.div=g.div;}
+      a.n=a.n+1; a.last=g.date; if(g.div)a.div=g.div;}   // a catch weight bout leaves the division alone
     if(g.s1&&g.s2&&g.dur>0)this.absorb(g);
   }
   absorb(g){
+    const L=this.decay;
     const push=(a,me,op,won)=>{
+      if(L<1)for(const k of DECAY_KEYS)a[k]*=L;
       a.min+=g.dur;a.sl+=me.sl;a.sa+=me.sa;a.osl+=op.sl;a.osa+=op.sa;
       a.tl+=me.tl;a.ta+=me.ta;a.otl+=op.tl;a.ota+=op.ta;
       a.ctrl+=me.ctrl;a.kd+=me.kd;a.sub+=me.sub;a.nf++;
@@ -510,7 +579,11 @@ const BASE='https://raw.githubusercontent.com/Greco1899/scrape_ufc_stats/main/';
 const KEY='corner.raw.v3', FITKEY='corner.fit.'+MODEL_VERSION;
 let M=null,ATT=new Map(),LOG=[],DIVS=[],VIEW='match',NAMES=[],FMETA=new Map();
 let THROUGH=null,FIT_MS=0,FIT_CACHED=false,MEDREACH=71;
+/* ALIAS (2.4): Corner fighter key -> {name, id}, the ufcstats name and fighter
+   id behind a key, for names ufcstats gives to more than one fighter. */
+let ALIAS=new Map(), NAMESET=new Set(), NAMES_FOLD=[], ACTIVE_NAMES=[];
 const attOf=f=>ATT.get(f)||{reach:NaN,stance:null,dob:null};
+const ufcName=k=>{ const x=ALIAS.get(k); return x?x.name:k; };
 
 const HAS_IDB=typeof indexedDB!=='undefined'&&indexedDB!==null;
 function idb(){return new Promise((res,rej)=>{
@@ -558,12 +631,20 @@ function build(d){
   for(const r of ev.rows) edate.set((r[ev.ix.EVENT]||'').trim(), pdate(r[ev.ix.DATE]));
 
   const tt=parseCSV(d.b); needCols(tt.ix,['FIGHTER','REACH','STANCE','DOB'],'ufc_fighter_tott.csv');
-  ATT=new Map();const reaches=[];
+  if(tt.ix.URL===undefined)tt.ix.URL=-1;
+  if(tt.ix.WEIGHT===undefined)tt.ix.WEIGHT=-1;
+  ATT=new Map();const reaches=[], same=new Map();
   for(const r of tt.rows){
-    const nm=(r[tt.ix.FIGHTER]||'').trim(); if(!nm||ATT.has(nm))continue;
+    const nm=(r[tt.ix.FIGHTER]||'').trim(); if(!nm)continue;
     const reach=inchesR(r[tt.ix.REACH]);
+    const at={reach,stance:(r[tt.ix.STANCE]||'').trim()||null,dob:pdate(r[tt.ix.DOB])};
+    /* every profile behind a name, so a name two fighters share can be told apart below */
+    const id=((r[tt.ix.URL]||'').match(/fighter-details\/([0-9a-f]+)/i)||[])[1]||'';
+    if(!same.has(nm))same.set(nm,new Map());
+    if(!same.get(nm).has(id))same.get(nm).set(id,{...at,id:id.toLowerCase(),lbs:lbsOf(r[tt.ix.WEIGHT])});
+    if(ATT.has(nm))continue;
     if(isFinite(reach))reaches.push(reach);
-    ATT.set(nm,{reach,stance:(r[tt.ix.STANCE]||'').trim()||null,dob:pdate(r[tt.ix.DOB])});
+    ATT.set(nm,at);
   }
   reaches.sort((a,b)=>a-b);
   MEDREACH=reaches.length?reaches[Math.floor(reaches.length/2)]:71;
@@ -611,12 +692,62 @@ function build(d){
     const s=agg.get(evName+'||'+bout);
     const sa=s?s[A]:null, sb=s?s[B]:null;
     out.push({f1:swap?B:A,f2:swap?A:B,date,y:swap?1-aWon:aWon,
-      div:wc.replace(' Bout','').replace('UFC ','').replace(' Title','').trim(),
+      div:divClass(wc),
+      lab:wc.replace(' Bout','').replace('UFC ','').replace(' Title','').trim(),
       method:(r[FX.METHOD]||'').trim(),dur,
       s1:swap?sb:sa, s2:swap?sa:sb});
   }
   out.sort((x,y)=>x.date-y.date);
+  splitShared(same,out);
   return out;
+}
+
+/* NAMES TWO FIGHTERS SHARE (2.4)
+   The results file names fighters, it does not identify them. Eight names in
+   ufcstats belong to two people. Two things went wrong:
+   1. Attributes came from whichever profile was listed first. Jean Silva the
+      featherweight, born 1996, was read as the other Jean Silva, born 1977,
+      and docked for being 48. Mike Davis lost his age and reach.
+   2. Bruno Silva the flyweight and Bruno Silva the middleweight were one
+      rating, fed by both careers.
+   Each fight is matched to the profile whose listed weight is that fight's
+   class limit. If only one profile has any such fight, the name is that
+   fighter and takes that profile. If two do, the name is split into two
+   fighters, keyed "Name (Class)". A fight in no class (catch weight) goes to
+   the profile whose other fights are nearest in time. */
+function splitShared(same,out){
+  ALIAS=new Map();
+  for(const[nm,byId]of same){
+    if(byId.size<2)continue;
+    const ents=[...byId.values()], fs=out.filter(g=>g.f1===nm||g.f2===nm);
+    const hits=ents.map(e=>fs.filter(g=>g.div&&classLbs(g.div)===e.lbs));
+    const act=ents.filter((e,i)=>hits[i].length);
+    const full=e=>(e.dob?2:0)+(isFinite(e.reach)?1:0);
+    if(act.length<2){
+      const e=act[0]||ents.slice().sort((x,y)=>full(y)-full(x))[0];
+      ATT.set(nm,{reach:e.reach,stance:e.stance,dob:e.dob});
+      if(act[0])ALIAS.set(nm,{name:nm,id:e.id});
+      continue;
+    }
+    const keyOf=new Map();
+    act.forEach(e=>{ const h=hits[ents.indexOf(e)], cnt={};
+      for(const g of h)cnt[g.div]=(cnt[g.div]||0)+1;
+      const top=Object.keys(cnt).sort((x,y)=>cnt[y]-cnt[x])[0];
+      const key=nm+' ('+top+')';
+      keyOf.set(e,key); ALIAS.set(key,{name:nm,id:e.id});
+      ATT.set(key,{reach:e.reach,stance:e.stance,dob:e.dob}); });
+    ATT.delete(nm);
+    for(const g of fs){
+      const lb=classLbs(g.div);
+      let e=act.find(x=>lb&&x.lbs===lb);
+      if(!e){ /* no class: the profile whose other fights are nearest in time */
+        let best=null,gap=Infinity;
+        for(const x of act)for(const h of hits[ents.indexOf(x)]){ const t=Math.abs(h.date-g.date); if(t<gap){gap=t;best=x;} }
+        e=best; }
+      const key=keyOf.get(e);
+      if(g.f1===nm)g.f1=key; else g.f2=key;
+    }
+  }
 }
 
 function fit(fights){
@@ -629,9 +760,11 @@ function fit(fights){
   for(const g of fights){
     const d=m.detail(g.f1,g.f2,g.date,g.div,attOf);
     if(cutoff&&g.date>=cutoff&&d.n1>=1&&d.n2>=1)
-      log.push({f1:g.f1,f2:g.f2,date:+g.date,div:g.div,y:g.y,p:d.p});
+      log.push({f1:g.f1,f2:g.f2,date:+g.date,div:g.div||g.lab,y:g.y,p:d.p});
     m.update(g,d);
-    rp.rows.push([rid(g.f1),rid(g.f2),+g.date,g.y]);
+    /* the fifth number is Corner's forecast, kept so the second opinion can
+       report how the two have done when they agree and when they do not */
+    rp.rows.push([rid(g.f1),rid(g.f2),+g.date,g.y,Math.round(d.p*1e4)/1e4]);
   }
   return{m,log,replay:rp};
 }
@@ -658,6 +791,7 @@ function fit(fights){
 const GL_S=173.7178, GL_TAU=0.5;
 const OS_URL='https://cdn.jsdelivr.net/npm/openskill@5.0.1/+esm';
 const SO_KEY='corner.rating.v1';
+const SO_SINCE=Date.UTC(2022,0,1);   // the agreement record counts fights from here
 const SO_DEFAULT={hi:140,lo:200,os:false};   // RD cutoffs, in rating points
 let SO_S=soLoad(), SO_GL=null, OS_MAP=null, OS_MOD=null, REPLAY=null, OS_STATE='off';   // OS_STATE: off, loading, ready, failed
 function soLoad(){
@@ -676,15 +810,25 @@ function glBuild(R){
   const pl=new Array(R.names.length).fill(null);
   const get=i=>pl[i]||(pl[i]=G.makePlayer());
   let cur=glMonth(R.rows[0][2]), batch=[];
-  for(const[i,j,t,y]of R.rows){
+  /* 2.4: how Corner did, since 2022, on fights where the two picked the same
+     fighter and where they did not, each forecast made before the fight */
+  const stats={since:SO_SINCE,agree:{n:0,right:0},disagree:{n:0,right:0}};
+  for(const[i,j,t,y,pc]of R.rows){
     const m=glMonth(t);
     while(cur<m){G.updateRatings(batch);batch=[];cur++;}
-    batch.push([get(i),get(j),y]);
+    const A=get(i), B=get(j);
+    if(t>=SO_SINCE&&pc!=null){
+      const pa=A.getRd()/GL_S, pb=B.getRd()/GL_S;
+      const pg=1/(1+Math.exp(-glG(Math.sqrt(pa*pa+pb*pb))*((A.getRating()-B.getRating())/GL_S)));
+      const s=stats[(pc>.5)===(pg>.5)?'agree':'disagree'];
+      s.n++; if((pc>.5)===(y===1))s.right++;
+    }
+    batch.push([A,B,y]);
   }
   G.updateRatings(batch);
   const map=new Map();
   pl.forEach((p,i)=>{if(p)map.set(R.names[i],{r:p.getRating(),rd:p.getRd(),vol:p.getVol()});});
-  return{through:cur,map};
+  return{through:cur,map,stats};
 }
 function glState(name,steps){
   const s=SO_GL.map.get(name)||{r:1500,rd:350,vol:0.06};
@@ -839,13 +983,26 @@ const SNAP_KEY='corner.snaps.v1';
 const fNorm=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
   .replace(/['\u2019.]/g,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
 let F_INDEX=null;
-/* Exact name first; then last name plus first initial when that is unique. */
-function fighterFor(apiName){
+/* Exact name first; then last name plus first initial when that is unique.
+   2.4: a name two fighters share resolves by the opponent's division, and an
+   exact match on a ufcstats profile with no UFC fight yet is a debut. Loose
+   matching stays limited to fighters with a UFC record, where a wrong match
+   would at least be a real UFC fighter's record. */
+function fighterFor(apiName,opp){
   if(!F_INDEX){ F_INDEX={exact:new Map(), byLast:new Map()};
-    for(const k of M.f.keys()){ if(k===REF) continue; const n=fNorm(k); F_INDEX.exact.set(n,k);
-      const parts=n.split(' '); const key=parts[parts.length-1]+'|'+(parts[0]||'')[0];
-      F_INDEX.byLast.set(key,(F_INDEX.byLast.get(key)||[]).concat(k)); } }
-  const n=fNorm(apiName); if(F_INDEX.exact.has(n)) return F_INDEX.exact.get(n);
+    const add=(m,k,v)=>{ const l=m.get(k); if(!l)m.set(k,[v]); else if(!l.includes(v))l.push(v); };
+    for(const k of M.f.keys()){ if(k===REF) continue; const n=fNorm(ufcName(k)); add(F_INDEX.exact,n,k);
+      const parts=n.split(' '); add(F_INDEX.byLast,parts[parts.length-1]+'|'+(parts[0]||'')[0],k); }
+    for(const k of ATT.keys()) if(!M.f.has(k)){ const n=fNorm(k); if(!F_INDEX.exact.has(n)) add(F_INDEX.exact,n,k); } }
+  const n=fNorm(apiName), ex=F_INDEX.exact.get(n);
+  if(ex){
+    if(ex.length===1) return ex[0];
+    /* one ufcstats name, two fighters: the one in the opponent's division, else the more recent */
+    const od=opp?(FMETA.get(opp)||{}).div:null;
+    const inDiv=ex.filter(k=>od&&(FMETA.get(k)||{}).div===od);
+    if(inDiv.length===1) return inDiv[0];
+    return ex.slice().sort((x,y)=>((FMETA.get(y)||{}).last||0)-((FMETA.get(x)||{}).last||0))[0];
+  }
   const parts=n.split(' '); const c=F_INDEX.byLast.get(parts[parts.length-1]+'|'+(parts[0]||'')[0])||[];
   return c.length===1?c[0]:null;
 }
@@ -858,11 +1015,41 @@ function cardRows(){
     const books=peBooksOf(ev,PE_S.mine), mine=books.filter(b=>b.mine);
     const c=peConsensus(books,'h2h',ev.home_team,ev.away_team);
     const best=nm=>{let t=null;for(const bk of mine){const v=bk.h2h[nm];if(v!=null&&(!t||peAmToDec(v)>peAmToDec(t.v)))t={v,k:bk.key};}return t;};
-    const a=fighterFor(ev.home_team), b=fighterFor(ev.away_team), when=new Date(ev.commence_time);
+    const a0=fighterFor(ev.home_team), b0=fighterFor(ev.away_team);
+    let a=a0&&fighterFor(ev.home_team,b0), b=b0&&fighterFor(ev.away_team,a0), unA=false, unB=false;
+    /* 2.4: a name ufcstats does not know at all, against a fighter with a UFC
+       record, is rated as a debut under the name the book uses. Two unknown
+       names are left out: that is most often another promotion's fight. */
+    const known=k=>k&&M.get(k).n>0;
+    if(!a&&known(b)){ a=ev.home_team; unA=true; }
+    if(!b&&known(a)){ b=ev.away_team; unB=true; }
+    const when=new Date(ev.commence_time);
     let d=null; if(a&&b&&a!==b) d=M.detail(a,b,when,divFor(a,b),attOf);
-    return {ev,nameA:ev.home_team,nameB:ev.away_team,a,b,when,d,
+    return {ev,nameA:ev.home_team,nameB:ev.away_team,a,b,unA,unB,when,d,
       nvA:c?c.pA:null, nBooks:c?c.n:0, bestA:best(ev.home_team), bestB:best(ev.away_team)};
   });
+}
+/* THE PICK (2.4)
+   One plain answer to "who wins". When the fight is priced it is the market's
+   favorite, because in the one side by side test on record (2,754 fights
+   against closing lines) the market picked 67.8% of winners and Corner 61.3%.
+   Without a price it is Corner's. Corner's own number always sits beside it. */
+const pickWord=p=>p<.55?'toss-up':p<.62?'lean':p<.72?'clear favorite':'strong favorite';
+function pickOf(pCorner,nvA){
+  if(nvA!=null){ const A=nvA>=.5; return {A,p:A?nvA:1-nvA,src:'market',agree:pCorner==null?null:(pCorner>=.5)===A,pc:pCorner}; }
+  if(pCorner==null) return null;
+  const A=pCorner>=.5; return {A,p:A?pCorner:1-pCorner,src:'corner',agree:null,pc:pCorner};
+}
+function pickLine(pk,nameA,nameB,cls){
+  if(!pk) return '';
+  const who=pk.A?nameA:nameB, side=pk.A?'l':'r';
+  let t=`Pick: <b class="${side}">${esc(who)}</b>, ${pc(pk.p)}, ${pickWord(pk.p)}`;
+  if(pk.src==='market'){
+    t+=' in the betting market.';
+    if(pk.agree===true) t+=' <span class="pill ok">Corner agrees</span>';
+    else if(pk.agree===false) t+=` <span class="pill warn">Corner picks ${esc(pk.A?nameB:nameA)}, ${pc(pk.A?1-pk.pc:pk.pc)}</span>`;
+  } else t+=cls==='cr-pick'?', from Corner. No market price yet.':', from Corner.';
+  return `<div class="${cls}">${t}</div>`;
 }
 async function loadSnaps(){ SNAPS=(await cacheGet(SNAP_KEY))||{}; }
 /* Every pull records Corner's number and the market's for each upcoming fight:
@@ -911,7 +1098,7 @@ async function refreshPrices(force){
 }
 const amer=v=>v==null?'n/a':(v>0?'+':'')+v;
 function renderCard(){
-  const el=$('card'); if(!el) return;
+  const el=$('card'), tools=$('cardTools'); if(!el) return;
   const keyForm=`<div class="opts">
       <input id="peKey" type="password" autocomplete="off" placeholder="The Odds API key" value="${esc(PE_S.key)}" style="flex:1;min-width:200px">
       <button id="peSave">Save</button><button id="peRefresh">Refresh prices</button></div>
@@ -920,8 +1107,8 @@ function renderCard(){
     Prices refresh on their own at most hourly while the app is open, and every pull adds to the disagreement log below.</p>`;
   const rows=M?cardRows():[];
   let body;
-  if(!PE_S.key) body=`<p class="note">Add a free key from the-odds-api.com to see the upcoming card with Corner's number next to the market's.</p>`;
-  else if(!rows.length) body=`<p class="note${PE_DATA&&PE_DATA.error?' err':''}">${PE_DATA&&PE_DATA.error?esc(PE_DATA.error)+'. Check the key above, then Refresh prices.':'No upcoming fights in the last pull.'}</p>`;
+  if(!PE_S.key) body=`<p class="note">Add a free key from the-odds-api.com to see the upcoming card with a pick for every fight and Corner's number next to the market's.</p>`;
+  else if(!rows.length) body=`<p class="note${PE_DATA&&PE_DATA.error?' err':''}">${PE_DATA&&PE_DATA.error?esc(PE_DATA.error)+'. Check the key below, then Refresh prices.':'No upcoming fights in the last pull.'}</p>`;
   else body=rows.map(r=>{
     const gap=r.d&&r.nvA!=null?r.d.p-r.nvA:null;
     const flag=gap!=null&&Math.abs(gap)>=0.05;
@@ -929,6 +1116,7 @@ function renderCard(){
     return `<div class="cardrow">
       <div class="cr-top"><span class="cr-names"><span class="l">${esc(r.nameA)}</span> vs <span class="r">${esc(r.nameB)}</span></span>
         <span class="cr-when">${r.when.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</span></div>
+      ${r.d?pickLine(pickOf(r.d.p,r.nvA),r.nameA,r.nameB,'cr-pick'):''}
       ${r.d?`<div class="cr-grid">
           <span>Corner</span><b class="l">${pc(r.d.p)}</b><b class="r">${pc(1-r.d.p)}</b>
           <span>Market, no vig</span><b>${r.nvA!=null?pc(r.nvA):'n/a'}</b><b>${r.nvA!=null?pc(1-r.nvA):'n/a'}</b>
@@ -936,7 +1124,8 @@ function renderCard(){
           <span>Best price</span><b>${r.bestA?amer(r.bestA.v)+' '+peShort(r.bestA.k):'n/a'}</b><b>${r.bestB?amer(r.bestB.v)+' '+peShort(r.bestB.k):'n/a'}</b>
         </div>
         <div class="cr-foot">${gap!=null?`Corner is ${(100*Math.abs(gap)).toFixed(1)} pts higher than the market on ${esc(gap>=0?r.nameA:r.nameB)}${flag?' <span class="pill">worth researching</span>':''}`:''}
-          ${thin?' <span class="pill warn">thin record</span>':''}</div>`
+          ${thin?' <span class="pill warn">thin record</span>':''}
+          ${r.unA||r.unB?`<br>${esc(r.unA?r.nameA:r.nameB)} is not in ufcstats under this name, so Corner rates a debut. Check the spelling if that is wrong.`:''}</div>`
         :`<div class="cr-foot">${!r.a||!r.b?'Not rated: '+esc([!r.a?r.nameA:null,!r.b?r.nameB:null].filter(Boolean).join(', '))+' has no UFC fights on record, or is spelled differently.':''}</div>`}
     </div>`;}).join('');
   // the test
@@ -957,9 +1146,16 @@ function renderCard(){
       ${mv?`Average move toward Corner: ${(100*mv.m).toFixed(2)} pts (95% range ${(100*mv.lo).toFixed(2)} to ${(100*mv.hi).toFixed(2)}).`:''}
       ${bDiff?`<br>Accuracy at the close on ${bDiff.n} finished fights: Corner's Brier score minus the market's is ${(bDiff.m).toFixed(4)} (below zero means Corner was more accurate).`:''}
       <br><br>Open is the first pull after a fight appears, close is the last pull before it starts. The more often the app is opened during fight week, the better the close.</div>`;
-  el.innerHTML=keyForm+body+test;
+  /* 2.4: the fights come first. The key form sits with them only until there
+     is something to show, then moves below the War Room panel with the test. */
+  const priced=rows.filter(r=>r.d&&r.nvA!=null), agree=priced.filter(r=>(r.d.p>=.5)===(r.nvA>=.5)).length;
+  const sum=rows.some(r=>r.d)?`<p class="cr-sum">The pick is the betting market's favorite when the fight is priced: it has picked
+    more winners than Corner when the two were tested side by side. Corner's own number sits beside it.
+    ${priced.length?`Corner agrees with the market on ${agree} of ${priced.length} priced fights.`:''}</p>`:'';
+  if(rows.length){ el.innerHTML=sum+body; tools.innerHTML=keyForm+test; }
+  else { el.innerHTML=body+keyForm; tools.innerHTML=test; }
   $('peSave').onclick=()=>{ PE_S.key=$('peKey').value.trim();
-    PE_S.mine=[...el.querySelectorAll('.pe-books input:checked')].map(x=>x.value); if(!PE_S.mine.length) PE_S.mine=PE_DEFAULT_MINE.slice();
+    PE_S.mine=[...document.querySelectorAll('.pe-books input:checked')].map(x=>x.value); if(!PE_S.mine.length) PE_S.mine=PE_DEFAULT_MINE.slice();
     peSaveSettings(PE_NS,PE_S); refreshPrices(true); };
   $('peRefresh').onclick=async e=>{ e.target.disabled=true; e.target.textContent='...'; await refreshPrices(true); };
 }
@@ -982,10 +1178,18 @@ function soMatchup(a,b,when,pCorner){
     <h3>Second opinion: Glicko-2 rating ${soPill(g.conf)}</h3>
     <div class="probnums"><span class="l">${pc(g.p)}</span><span class="r">${pc(1-g.p)}</span></div>
     <div class="so-meta">Rating ${Math.round(g.rA)} &plusmn; ${Math.round(g.rdA)} against ${Math.round(g.rB)} &plusmn; ${Math.round(g.rdB)}.
-      ${soAgree(pCorner,g.p)?'Picks the same fighter as Corner.':'<b>Picks the other fighter than Corner.</b>'}
+      ${soRecord(soAgree(pCorner,g.p))}
       ${os!=null?`<br>OpenSkill: ${pc(os)} / ${pc(1-os)}`:(SO_S.os&&OS_STATE==='loading'?'<br>OpenSkill is loading.':(SO_S.os&&OS_STATE==='failed'?'<br>OpenSkill could not be loaded.':''))}
       <br>Built from wins and losses alone. Corner's forecast above is unchanged by it.</div>
   </div>`;
+}
+/* What a disagreement has meant so far, from the replay, instead of a bold
+   warning that read as stronger evidence than it is. */
+function soRecord(same){
+  const x=SO_GL&&SO_GL.stats&&SO_GL.stats[same?'agree':'disagree'];
+  const rec=x&&x.n?` Since ${new Date(SO_GL.stats.since).getUTCFullYear()}, when the two ${same?'agreed':'disagreed'}, Corner picked the winner in ${Math.round(100*x.right/x.n)}% of ${x.n.toLocaleString()} fights.`:'';
+  return same?'Picks the same fighter as Corner.'+rec
+    :'Picks the other fighter.'+rec+' Treat it as a reason to look closer, not as a reversal.';
 }
 function soCardRows(a,b,when){
   const g=glPair(a,b,when); if(!g) return '';
@@ -1020,10 +1224,106 @@ function renderSettings(){
   $('soHi').oninput=apply; $('soLo').oninput=apply;
   $('soOs').onchange=e=>{ SO_S.os=e.target.checked; soSave(); if(SO_S.os) osEnsure(); };
   $('soReset').onclick=()=>{ SO_S={...SO_DEFAULT,os:SO_S.os}; soSave(); renderSettings(); };
+  renderBackup();
+}
+
+/* ============================================================
+   DISAGREEMENT LOG BACKUP  (2.4)
+
+   The Card tab's test of whether Corner sees anything the market does not
+   needs about fifty fights, which is months of cards, and the record lives
+   only in this browser, which a phone can clear. Export writes it to a file;
+   Import merges a file back in, keeping the earliest open and the latest close
+   for each fight, so importing the same file twice changes nothing.
+   ============================================================ */
+const BK_FORMAT='corner_ufc.disagreement_log';
+function snapsMerge(inc){
+  let added=0, updated=0, skipped=0;
+  const pt=x=>x&&isFinite(x.t)&&isFinite(x.p)&&isFinite(x.nv)?{t:+x.t,p:+x.p,nv:+x.nv}:null;
+  for(const[id,x]of Object.entries(inc&&typeof inc==='object'?inc:{})){
+    const f=pt(x&&x.first), l=pt(x&&x.last);
+    if(!x||typeof x.a!=='string'||typeof x.b!=='string'||!isFinite(x.start)||!f||!l){ skipped++; continue; }
+    const cur=SNAPS[id];
+    if(!cur){ SNAPS[id]={a:x.a,b:x.b,start:+x.start,first:f,last:l}; added++; continue; }
+    let ch=false;
+    if(!cur.first||f.t<cur.first.t){ cur.first=f; ch=true; }
+    if(!cur.last||l.t>cur.last.t){ cur.last=l; ch=true; }
+    if(ch) updated++;
+  }
+  return {added,updated,skipped};
+}
+function renderBackup(){
+  const el=$('settings'); if(!el) return;
+  const all=Object.values(SNAPS), done=all.filter(x=>x.start<=Date.now()).length;
+  const box=document.createElement('div');
+  box.className='so'; box.style.marginTop='22px';
+  box.innerHTML=`<h3 style="font-size:15px;color:var(--ink)">Disagreement log backup</h3>
+    <p class="note" style="padding:0 0 10px">The Card tab records Corner's number and the market's at every price
+    pull, to test whether Corner sees anything first. That record is kept only in this browser, and a phone can
+    clear it. <b>${all.length}</b> fight${all.length===1?'':'s'} recorded, ${done} already fought. Export a copy
+    now and then. Import merges a copy back in without losing anything already here.</p>
+    <div class="opts"><button id="bkExport">Export log</button><button id="bkImport">Import log</button>
+      <button id="bkPersist">Keep it on this device</button></div>
+    <input id="bkFile" type="file" accept=".json,application/json" style="display:none">
+    <p id="bkMsg" class="note" role="status" aria-live="polite" style="padding:0"></p>`;
+  el.appendChild(box);
+  const msg=(t,err)=>{ const m=$('bkMsg'); m.textContent=t; m.classList.toggle('err',!!err); };
+  $('bkExport').onclick=()=>{
+    const json=JSON.stringify({format:BK_FORMAT,version:1,model_version:MODEL_VERSION,exported_at:new Date().toISOString(),snaps:SNAPS},null,1);
+    const name='corner-disagreement-log-'+new Date().toISOString().slice(0,10)+'.json';
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([json],{type:'application/json'})); a.download=name;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    msg(`Saved ${name}, ${all.length} fight${all.length===1?'':'s'}.`);
+  };
+  $('bkImport').onclick=()=>$('bkFile').click();
+  $('bkFile').onchange=async e=>{
+    const f=e.target.files&&e.target.files[0]; e.target.value=''; if(!f) return;
+    let o=null; try{ o=JSON.parse(await f.text()); }catch(x){}
+    if(!o||o.format!==BK_FORMAT||!o.snaps){ msg('That file is not a Corner disagreement log export.',true); return; }
+    const r=snapsMerge(o.snaps);
+    if(r.added||r.updated) await cacheSet(SNAP_KEY,SNAPS);
+    renderSettings();
+    msg(`Imported: ${r.added} new fight${r.added===1?'':'s'}, ${r.updated} updated${r.skipped?`, ${r.skipped} unreadable left out`:''}.`);
+  };
+  const st=navigator.storage;
+  if(!st||!st.persist){ $('bkPersist').style.display='none'; return; }
+  if(st.persisted) st.persisted().then(p=>{ if(p&&$('bkPersist')){ $('bkPersist').disabled=true; $('bkPersist').textContent='Kept on this device'; } }).catch(()=>{});
+  $('bkPersist').onclick=async()=>{
+    let ok=false; try{ ok=await st.persist(); }catch(x){}
+    msg(ok?'The browser will keep this data unless you clear it yourself.'
+      :'The browser declined. Adding the app to the home screen usually helps; until then, export the log now and then.',!ok);
+    if(ok){ $('bkPersist').disabled=true; $('bkPersist').textContent='Kept on this device'; }
+  };
 }
 /* a finished OpenSkill load redraws whatever tab is showing */
 function soRerender(){ if(VIEW==='match') { if(comboA) drawVerdict(); } else if(VIEW==='card') renderCard(); else if(VIEW==='settings') renderSettings(); }
 
+/* FIGHTER SEARCH (2.4)
+   Every fighter with a UFC fight can be picked, not only the 861 active in the
+   last thirty months, and so can anyone with a ufcstats profile and no UFC
+   fight yet, who is rated as a debut. Active fighters list first, then likely
+   debutants, then former fighters. Accents and case are ignored. */
+const fold=x=>String(x||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function nameGroup(n){
+  const m=FMETA.get(n);
+  if(m) return m.last>=Date.now()-900*864e5?0:2;
+  const a=ATT.get(n), age=a&&a.dob?(Date.now()-a.dob)/(365.25*864e5):null;
+  return age==null||age<38?1:3;
+}
+function searchNames(q){
+  const s=fold(q.trim());
+  if(!s) return ACTIVE_NAMES.slice(0,60);
+  const hit=[];
+  for(let i=0;i<NAMES.length&&hit.length<4000;i++) if(NAMES_FOLD[i].includes(s)) hit.push(NAMES[i]);
+  const g=new Map(hit.map(n=>[n,nameGroup(n)]));
+  return hit.sort((x,y)=>g.get(x)-g.get(y)).slice(0,60);   // stable: alphabetical within a group
+}
+function nameNote(n){
+  const m=FMETA.get(n);
+  if(!m) return 'No UFC fights on record, rated as a debut';
+  const old=m.last<Date.now()-900*864e5;
+  return `${m.n||0} UFC fight${m.n===1?'':'s'}${old?' &middot; last '+new Date(m.last).getUTCFullYear():''}${m.div?' &middot; '+esc(m.div):''}`;
+}
 function makeCombo(rootId,initial,onPick){
   const root=$(rootId);
   const inp=root.querySelector('input');
@@ -1034,16 +1334,12 @@ function makeCombo(rootId,initial,onPick){
 
   const close=()=>{list.classList.remove('open');inp.setAttribute('aria-expanded','false');hi=-1;};
   const draw=q=>{
-    const s=q.trim().toLowerCase();
-    shown=(s?NAMES.filter(n=>n.toLowerCase().includes(s)):NAMES).slice(0,60);
+    shown=searchNames(q);
     if(!shown.length){
       list.innerHTML='<div class="none">No fighter matches that.</div>';
     }else{
-      list.innerHTML=shown.map((n,i)=>{
-        const m=FMETA.get(n)||{};
-        return `<div data-i="${i}" role="option">${esc(n)}
-          <small>${m.n||0} UFC fight${m.n===1?'':'s'}${m.div?' &middot; '+esc(m.div):''}</small></div>`;
-      }).join('');
+      list.innerHTML=shown.map((n,i)=>`<div data-i="${i}" role="option">${esc(n)}
+          <small>${nameNote(n)}</small></div>`).join('');
     }
     list.classList.add('open');inp.setAttribute('aria-expanded','true');
     list.scrollTop=0;
@@ -1137,7 +1433,7 @@ function autoDiv(){
 function drawVerdict(){
   const a=comboA.get(),bn=comboB.get(),dv=$('dv').value;
   const el=$('verdict');
-  if(!NAMES.includes(a)||!NAMES.includes(bn)){
+  if(!NAMESET.has(a)||!NAMESET.has(bn)){
     el.innerHTML='<p class="note">Search and select a fighter for each corner.</p>';return;}
   if(a===bn){el.innerHTML='<p class="note">Pick two different fighters.</p>';return;}
   const dateStr=$('fdate').value;
@@ -1154,8 +1450,14 @@ function drawVerdict(){
   const divWarn=(ma&&mb&&ma.div&&mb.div&&(ma.div!==dv||mb.div!==dv))
     ? `<div class="flag">Weight class move priced in. ${esc(a)} last fought at
        ${esc(ma.div)} and ${esc(bn)} at ${esc(mb.div)}, against ${esc(dv)} here.</div>`:'';
+  /* the pick (2.4): the market's when this pairing is on the priced card */
+  const onCard=M&&PE_DATA?cardRows().find(r=>r.d&&r.nvA!=null&&((r.a===a&&r.b===bn)||(r.a===bn&&r.b===a))):null;
+  const nv=onCard?(onCard.a===a?onCard.nvA:1-onCard.nvA):null;
+  const pick=pickLine(pickOf(d.p,nv),a,bn,'pick')
+    +(onCard?`<div class="pick" style="margin-top:-6px;font-size:12.5px">Market price from the card on ${onCard.when.toLocaleDateString(undefined,{month:'short',day:'numeric'})}.</div>`:'');
   el.innerHTML=`
   <div class="verdict">
+    ${pick}
     <div class="names"><span class="l">${esc(a)}</span><span class="r">${esc(bn)}</span></div>
     <div class="probbar"><span style="width:${(100*d.p).toFixed(1)}%"></span></div>
     <div class="probnums"><span class="l">${pc(d.p)}</span><span class="r">${pc(1-d.p)}</span></div>
@@ -1369,6 +1671,7 @@ async function wrLoadIds(){
       } } }catch(e){}
   const ids=new Map();
   for(const [nm,s] of seen) if(s.size===1) ids.set(nm,[...s][0]);
+  for(const [k,x] of ALIAS) if(x.id) ids.set(k,x.id);   // 2.4: shared names resolved at build
   return ids;
 }
 
@@ -1393,7 +1696,9 @@ function wrRecords(r,day,label){
   if(idle(r.a)>WR_LAYOFF_DAYS||idle(r.b)>WR_LAYOFF_DAYS) fl.push('layoff');
   if([r.a,r.b].some(f=>{ const v=M.get(f).div; return v&&dv&&v!==dv; })) fl.push('weight_class_move');
   if(r.nvA!=null&&Math.abs(d.p-r.nvA)>=0.05) fl.push('worth_researching');
-  if(fNorm(r.nameA)!==fNorm(r.a)||fNorm(r.nameB)!==fNorm(r.b)) fl.push('name_matched_loosely');
+  if(fNorm(r.nameA)!==fNorm(ufcName(r.a))||fNorm(r.nameB)!==fNorm(ufcName(r.b))) fl.push('name_matched_loosely');
+  if(d.n1===0||d.n2===0) fl.push('debut');
+  if(r.unA||r.unB) fl.push('no_ufcstats_profile');
   const books=peBooksOf(r.ev,PE_S.mine);
   const price=(best,oppName)=>{
     if(!best) return null;
@@ -1409,7 +1714,8 @@ function wrRecords(r,day,label){
     if(os!=null) o.openskill_prob_win=wr6(first?os:1-os);
     return o;
   };
-  const part=(role,name)=>{ const id=WR_IDS&&WR_IDS.get(name); return id?{role,name,source_id:id}:{role,name}; };
+  /* the ufcstats name, and its id, behind Corner's key (a split shared name is keyed "Name (Class)") */
+  const part=(role,key)=>{ const id=WR_IDS&&WR_IDS.get(key), name=ufcName(key); return id?{role,name,source_id:id}:{role,name}; };
   const event={source_event_id:r.ev.id,start_time:day+'T00:00:00Z',start_time_precision:'date',timezone:WR_TZ,
     participants:[part('fighter_a',r.a),part('fighter_b',r.b)]};
   return [['fighter_a',r.a,d.p,d.pRaw,d.n1,d.n2,r.bestA,r.nameB],['fighter_b',r.b,1-d.p,1-d.pRaw,d.n2,d.n1,r.bestB,r.nameA]]
@@ -1417,7 +1723,7 @@ function wrRecords(r,day,label){
       const pr=price(best,oppName), flags=fl.slice();
       if(!pr) flags.push('no_price_in_app');
       const rec={record_id:'corner_ufc-'+r.ev.id+'-moneyline-'+side,sport:'UFC',league:'UFC',season:+day.slice(0,4),
-        grouping:{type:'card',label},event,market:{type:'moneyline',period:'full_event'},selection:{side,label:name}};
+        grouping:{type:'card',label},event,market:{type:'moneyline',period:'full_event'},selection:{side,label:ufcName(name)}};
       if(pr) rec.price=pr;
       rec.model={prob_win:wr6(p),prob_push:0,prob_loss:wr6(1-p),
         projection:{prob_before_uncertainty:wr6(raw),ufc_fights:n,opponent_ufc_fights:on,assumed_division:dv,...second(side==='fighter_a')}};
@@ -1441,7 +1747,7 @@ function wrBuild(){
   const payload={contract:'warroom.import',contract_version:'1.0',
     batch:{source_batch_id:'corner_ufc-'+g.day.slice(0,4)+'-'+label+'-'+wrStamp(now),source_app:'corner_ufc',
       model_name:'Corner UFC',model_version:MODEL_VERSION,
-      model_config:{rating:{...P},feature_coefficients:{...FB},shrinkage:{K_MIN,K_ATT,K_N},scale:SCALE,
+      model_config:{rating:{...P},feature_coefficients:{...FB},shrinkage:{K_MIN,K_ATT,K_N},scale:SCALE,stat_decay:STAT_DECAY,
         fit_date:FIT_DATE,data_through:iso(THROUGH),fighters_rated:M.f.size,
         thin_record_below_fights:4,worth_researching_gap:0.05,layoff_flag_days:WR_LAYOFF_DAYS,
         price_source:'odds_api',books:PE_S.mine.map(peShort),prices_pulled_at:PE_DATA&&PE_DATA.at?wrIso(PE_DATA.at):null,
@@ -1539,14 +1845,14 @@ function wrRefresh(){
   lab.placeholder=WR_DATE?wrDefaultLabel(WR_DATE):'Card label'; lab.disabled=!WR_DATE;
   const g=C.days.find(x=>x.day===WR_DATE);
   const list=g?g.fights.map(r=>{
-    const shown=esc(r.nameA)+' vs '+esc(r.nameB), sent=r.a+' vs '+r.b;
-    const alt=r.nameA!==r.a||r.nameB!==r.b;
+    const shown=esc(r.nameA)+' vs '+esc(r.nameB), sent=ufcName(r.a)+' vs '+ufcName(r.b);
+    const alt=r.nameA!==ufcName(r.a)||r.nameB!==ufcName(r.b);
     return `<label><input type="checkbox" value="${esc(r.ev.id)}"${WR_OFF.has(r.ev.id)?'':' checked'}>
       <span>${shown}${alt?` <small>sent as ${esc(sent)}</small>`:''}</span></label>`;}).join(''):'';
   if(list!==WR_LIST){ $('wrFights').innerHTML=list; WR_LIST=list; }
   let count='';
   if(!g) count=PE_S.key?'Nothing to send: no fight Corner rates on the card is still to come.'
-    :'Add an Odds API key below. The card comes from the price pull.';
+    :'Add an Odds API key above. The card comes from the price pull.';
   else{
     const on=g.fights.filter(r=>!WR_OFF.has(r.ev.id)).length, off=g.fights.length-on, left=[];
     if(off) left.push(`${off} unticked`);
@@ -1650,7 +1956,7 @@ function packFit(){
   return{v:MODEL_VERSION,through:+THROUGH,
     model:M.snapshot(),log:LOG,divs:DIVS,medreach:MEDREACH,replay:REPLAY,
     att:[...ATT].map(([k,a])=>[k,{reach:isFinite(a.reach)?a.reach:null,stance:a.stance,dob:a.dob?+a.dob:null}]),
-    fmeta:[...FMETA].map(([k,m])=>[k,{n:m.n,div:m.div,last:m.last}])};
+    fmeta:[...FMETA].map(([k,m])=>[k,{n:m.n,div:m.div,last:m.last}]),alias:[...ALIAS]};
 }
 function unpackFit(c){
   if(!c||c.v!==MODEL_VERSION||!Array.isArray(c.att)||!c.replay)return false;
@@ -1658,27 +1964,37 @@ function unpackFit(c){
     M=UFCModel.from(c.model);LOG=c.log;DIVS=c.divs;MEDREACH=c.medreach;REPLAY=c.replay;
     FMETA=new Map(c.fmeta);
     ATT=new Map(c.att.map(([k,a])=>[k,{reach:a.reach==null?NaN:a.reach,stance:a.stance,dob:a.dob==null?null:new Date(a.dob)}]));
-    NAMES=[...FMETA.keys()].sort((a,b)=>a.localeCompare(b));
+    ALIAS=new Map(c.alias||[]);
+    indexNames();
     THROUGH=new Date(c.through);
     return true;
   }catch(e){return false;}
 }
 
 function indexFighters(F){
+  /* 2.4: every fighter, not only the last thirty months, with the division
+     taken from his last fight in a weight class (a catch weight bout no longer
+     files him under "Catch Weight"). The Rankings filter is unchanged. */
   const cut=Date.now()-900*864e5;
   FMETA=new Map();
   for(const g of F){
-    if(+g.date<cut)continue;
     for(const f of [g.f1,g.f2]){
       let m=FMETA.get(f); if(!m){m={n:0,div:null,last:0};FMETA.set(f,m);}
-      if(+g.date>m.last){m.last=+g.date;m.div=g.div;}
+      if(+g.date>=m.last){m.last=+g.date; if(g.div)m.div=g.div;}
     }
   }
   for(const[f,m]of FMETA)m.n=M.get(f).n;
-  NAMES=[...FMETA.keys()].sort((a,b)=>a.localeCompare(b));
   const dc={};
-  for(const g of F) if(+g.date>=cut) dc[g.div]=(dc[g.div]||0)+1;
+  for(const g of F) if(+g.date>=cut&&g.div) dc[g.div]=(dc[g.div]||0)+1;
   DIVS=Object.keys(dc).sort((a,b)=>dc[b]-dc[a]).slice(0,14);
+  indexNames();
+}
+/* the picker's list: fighters with UFC fights, plus ufcstats profiles with none */
+function indexNames(){
+  const all=new Set(FMETA.keys()); for(const k of ATT.keys()) all.add(k);
+  NAMES=[...all].sort((a,b)=>a.localeCompare(b));
+  NAMESET=new Set(NAMES); NAMES_FOLD=NAMES.map(fold);
+  ACTIVE_NAMES=NAMES.filter(n=>nameGroup(n)===0);
 }
 
 async function boot(force){
@@ -1720,6 +2036,7 @@ async function boot(force){
     $('foot2').textContent=`Model ${MODEL_VERSION}, fitted ${FIT_DATE}. `
       +`Statistical features fitted on every fight before 2022 and tested after: `
       +`held out AUC 0.680 against 0.658 without them. `
+      +`Refit in 2.4 the same way: 62.8% of winners picked since 2022, against 61.4% before. `
       +(A?`Live on the last ${LOG.length} fights: AUC ${A.toFixed(3)}.`:'');
 
     const b=$('matchBody');b.dataset.built='';
